@@ -1,4 +1,4 @@
-# JanSuno 🇮🇳
+#SamadhanSetu🇮🇳
 ### Awaaz se Samadhan tak.
 
 **An Agentic AI-powered Public Grievance Intelligence & Resolution Platform**
