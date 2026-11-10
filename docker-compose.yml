@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  db:
+    image: pgvector/pgvector:pg15
+    env_file:
+      - ./env.template
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./backend/database/init-db:/docker-entrypoint-initdb.d:ro
+
+  backend:
+    build: ./backend
+    env_file:
+      - ./env.template
+    command: uvicorn app.main:app --host 0.0.0.0 --port ${FASTAPI_PORT:-8000} --reload
+    volumes:
+      - ./backend:/app
+    ports:
+      - "${FASTAPI_PORT:-8000}:${FASTAPI_PORT:-8000}"
+    depends_on:
+      - db
+
+volumes:
+  db_data:
