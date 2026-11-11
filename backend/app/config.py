@@ -1,25 +1,31 @@
-from pydantic import BaseSettings, Field
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
 
 class Settings(BaseSettings):
-    FASTAPI_HOST: str = Field("0.0.0.0", env="FASTAPI_HOST")
-    FASTAPI_PORT: int = Field(8000, env="FASTAPI_PORT")
+    FASTAPI_HOST: str = "0.0.0.0"
+    FASTAPI_PORT: int = 8000
 
-    POSTGRES_USER: str = Field(..., env="POSTGRES_USER")
-    POSTGRES_PASSWORD: str = Field(..., env="POSTGRES_PASSWORD")
-    POSTGRES_DB: str = Field(..., env="POSTGRES_DB")
-    POSTGRES_HOST: str = Field("db", env="POSTGRES_HOST")
-    POSTGRES_PORT: int = Field(5432, env="POSTGRES_PORT")
+    POSTGRES_USER: str = "ss_user"
+    POSTGRES_PASSWORD: str = "ss_password"
+    POSTGRES_DB: str = "ss_db"
+    POSTGRES_HOST: str = "db"
+    POSTGRES_PORT: int = 5432
 
-    DATABASE_URL: str = Field(..., env="DATABASE_URL")
+    DATABASE_URL: str = (
+        "postgresql+asyncpg://ss_user:ss_password@db:5432/ss_db"
+    )
 
-    OPENAI_API_KEY: str | None = Field(None, env="OPENAI_API_KEY")
-    OPENAI_API_BASE: str | None = Field(None, env="OPENAI_API_BASE")
+    OPENAI_API_KEY: str | None = None
+    OPENAI_API_BASE: str | None = None
 
-    FRONTEND_URL: str = Field("http://localhost:3000", env="FRONTEND_URL")
+    FRONTEND_URL: str = "http://localhost:5173"
+    APP_ENV: str = "development"
 
-    APP_ENV: str = Field("development", env="APP_ENV")
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        extra="ignore",
+    )
 
-    class Config:
-        env_file = ".env"
 
 settings = Settings()

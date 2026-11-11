@@ -1,3 +1,4 @@
+
 fastapi
 uvicorn[standard]
 sqlmodel
@@ -5,7 +6,8 @@ sqlalchemy[asyncio]
 asyncpg
 httpx
 python-dotenv
-pydantic
+pydantic>=2,<3
+pydantic-settings>=2,<3
 alembic
 pgvector
 pytest
