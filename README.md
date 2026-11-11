@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # Samadhan Setu
 
 AI-powered citizen grievance navigation and intelligence platform — prototype / hackathon MVP.
@@ -43,7 +43,7 @@ License: MIT
 
 **An Agentic AI-powered Public Grievance Intelligence & Resolution Platform**
 
-JanSuno is an open-source, multilingual platform designed to help Indian citizens navigate public grievance redressal mechanisms. It uses AI to understand complaints, identify relevant government departments, retrieve official procedures, generate structured grievances and guide citizens through resolution and escalation.
+Samadhan Setu is an open-source, multilingual platform designed to help Indian citizens navigate public grievance redressal mechanisms. It uses AI to understand complaints, identify relevant government departments, retrieve official procedures, generate structured grievances and guide citizens through resolution and escalation.
 
 Our vision is simple: **Every citizen should know where to raise a concern, how to raise it, and what to do next.**
 
@@ -68,13 +68,13 @@ This creates a gap between the availability of public services and citizens' abi
 
 ## Our Solution
 
-JanSuno aims to bridge this gap through an intelligent, citizen-first grievance navigation system.
+Samadhan Setu aims to bridge this gap through an intelligent, citizen-first grievance navigation system.
 
-Instead of requiring citizens to understand government departments and administrative procedures, JanSuno allows them to describe their problems in everyday language.
+Instead of requiring citizens to understand government departments and administrative procedures, Samadhan Setu allows them to describe their problems in everyday language.
 
 The platform then helps them navigate the grievance resolution journey.
 
-### How JanSuno Works
+### How Samadhan Setu Works
 
 1. **Report a Grievance:** Citizens describe their issue through text or other supported inputs.
 2. **Understand & Classify:** AI identifies the grievance category, extracts relevant details and asks clarifying questions.
@@ -102,7 +102,7 @@ The platform then helps them navigate the grievance resolution journey.
 
 ## Grievance Categories
 
-JanSuno is designed around six major public-service categories:
+Samadhan Setu is designed around six major public-service categories:
 
 1. **Welfare & Government Schemes**
    - Pension and scholarship delays
@@ -143,7 +143,7 @@ JanSuno is designed around six major public-service categories:
 
 ## Agentic AI Architecture
 
-JanSuno aims to use a coordinated AI workflow rather than a conventional question-answering chatbot.
+Samadhan Setu aims to use a coordinated AI workflow rather than a conventional question-answering chatbot.
 
 The proposed architecture includes:
 
@@ -176,7 +176,7 @@ All consequential recommendations should be grounded in verified sources, with h
 
 ## Governance Intelligence Dashboard
 
-Beyond individual grievance assistance, JanSuno aims to provide an aggregated view of recurring public-service delivery problems.
+Beyond individual grievance assistance, Samadhan Setu aims to provide an aggregated view of recurring public-service delivery problems.
 
 Potential insights include:
 
@@ -194,7 +194,7 @@ The objective is to transform grievance data into actionable governance insights
 ## Project Structure
 
 ```text
-JanSuno/
+Samadhan Setu/
 │
 ├── frontend/
 │   └── Citizen-facing application
@@ -237,7 +237,7 @@ JanSuno/
 
 ## Open Source & Digital Public Good
 
-JanSuno is being developed as an open-source digital public good with the vision of making grievance navigation more accessible across India.
+Samadhan Setu is being developed as an open-source digital public good with the vision of making grievance navigation more accessible across India.
 
 We aim to enable:
 
@@ -253,7 +253,7 @@ The project is intended to complement existing government grievance mechanisms, 
 
 ## Impact We Aim to Measure
 
-JanSuno will be evaluated on measurable outcomes rather than the number of AI features implemented.
+Samadhan Setu will be evaluated on measurable outcomes rather than the number of AI features implemented.
 
 Potential evaluation metrics:
 
@@ -304,7 +304,7 @@ Contributions can be proposed through GitHub Issues and Pull Requests.
 
 ## Important Disclaimer
 
-JanSuno is an informational and grievance-navigation tool. It does not replace official government grievance portals, legal professionals or authorised public authorities.
+Samadhan Setu is an informational and grievance-navigation tool. It does not replace official government grievance portals, legal professionals or authorised public authorities.
 
 AI-generated information must be verified against official sources. The platform does not guarantee complaint acceptance, government action or grievance resolution.
 
@@ -314,7 +314,7 @@ Citizens' personal information and uploaded documents must be handled securely a
 
 ## Built for India 🇮🇳
 
-**JanSuno — Awaaz se Samadhan tak.**
+**Samadhan Setu — Awaaz se Samadhan tak.**
 
 An open-source initiative to make public grievance redressal more accessible, transparent and actionable.
 
