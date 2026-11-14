@@ -3,9 +3,9 @@
 
 **A citizen-first public grievance navigation prototype.**
 
-Samadhan Setu helps people organise a public-service concern, understand a preliminary category suggestion, prepare an editable complaint draft, and record their own follow-up notes. It is an assistance layer—not a government complaint portal.
+Samadhan Setu is an independent civic-assistance and navigation platform. It helps people organise a public-service concern, understand a preliminary category suggestion, prepare an editable complaint draft, and record their own follow-up notes. It is not a government complaint portal.
 
-> **Honest MVP scope:** The current build uses transparent keyword-based categorisation (English and selected Hindi terms), general checklists, editable complaint drafts and citizen-entered follow-ups. It does not submit complaints, verify live government status, guarantee resolution, or claim to be a trained AI system.
+> **Honest MVP scope:** The local prototype uses deterministic keyword categorisation and general checklists. The hosted branch now runs a more specific deterministic taxonomy in PostgreSQL. Neither path is a trained LLM classifier, authority determination or official grievance channel. The app does not submit complaints, verify live government status or guarantee resolution.
 
 
 ## Hosted platform foundation (in progress)
@@ -92,7 +92,7 @@ The local prototype stores data in `backend/data/samadhan.db` and has no authent
 
 ## Vercel preview
 
-The redesigned Vite dashboard includes a Vercel static-site configuration. Deployment instructions and the production safety checklist are in [docs/VERCEL_DEPLOYMENT.md](docs/VERCEL_DEPLOYMENT.md). The frontend can be deployed as a visual preview; the current SQLite API is not ready for public multi-user submissions because Vercel storage is ephemeral and the API has no authentication or record ownership.
+The Vite frontend is configured for Vercel with the project root set to `frontend`. Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` to Vercel and apply both Supabase migrations before testing hosted sign-in and records. The hosted frontend talks directly to Supabase; it does not use the local SQLite API. Do not deploy or expose the legacy FastAPI/SQLite service as a public multi-user backend. Deployment instructions and safety checklist are in [docs/VERCEL_DEPLOYMENT.md](docs/VERCEL_DEPLOYMENT.md).
 
 ## Architecture
 
