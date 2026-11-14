@@ -86,9 +86,9 @@ The local prototype stores data in `backend/data/samadhan.db` and has no authent
 - No trained LLM/agent or claim of AI-powered reasoning.
 - No verified local authority directory or official portal recommendations.
 - No live government API, complaint submission or status tracking.
-- No trained LLM classification or verified authority routing engine.
+- No verified authority assignment engine or live source retrieval; jurisdiction hints are not authority determinations.
 - No evidence upload or official-document RAG.
-- Language selection is recorded, but the interface and complaint generator are not fully multilingual.
+- Hindi/English support is partial; some detail labels, help text and assistant responses still need a complete language QA pass.
 
 ## Vercel preview
 
@@ -146,12 +146,12 @@ GitHub Actions runs both checks on pushes and pull requests to main.
 - [x] Local record deletion
 - [x] Complaint draft and follow-up workflow
 - [x] API tests and CI
-- [ ] Authentication and multi-user authorisation
-- [ ] Verified authority directory with source provenance
+- [x] Email/password authentication and user-scoped hosted records with RLS (requires operator setup and deployment tests)
+- [ ] Human-verified authority directory with source provenance
 - [ ] Official-source retrieval with citations
-- [ ] Fully multilingual interface and evaluation
-- [ ] Persistent hosted database, authentication and record-level authorisation
-- [ ] Security review and fully functional hosted deployment
+- [ ] Full Hindi/English translation and language-specific evaluation
+- [x] Supabase hosted database schema and RLS foundation (operator must apply migrations and verify)
+- [ ] Security review, accessibility audit and fully functional hosted deployment
 
 ## License
 
