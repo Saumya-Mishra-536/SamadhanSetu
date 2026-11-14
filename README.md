@@ -90,10 +90,10 @@ See [architecture](docs/ARCHITECTURE.md), [privacy and safety](docs/PRIVACY_AND_
 | Method | Endpoint | Purpose |
 |---|---|---|
 | GET | `/health` | Health check |
-| GET | `/api/v1/categories` | Categories |\n| GET | `/api/v1/resources` | Source-linked official grievance channels |
+| GET | `/api/v1/categories` | Categories |\n| GET | `/api/v1/resources` | Source-linked official grievance channels |\n| GET | `/api/v1/resources` | Source-linked official grievance channels |
 | POST | `/api/v1/grievances` | Create grievance |
 | GET | `/api/v1/grievances` | List saved grievances |
-| GET | `/api/v1/grievances/{id}` | Grievance details |
+| GET | `/api/v1/grievances/{id}` | Grievance details |\n| DELETE | `/api/v1/grievances/{id}` | Delete a local record and its follow-ups |
 | PATCH | `/api/v1/grievances/{id}/complaint` | Update draft |
 | PATCH | `/api/v1/grievances/{id}/classification` | Citizen category correction |
 | POST | `/api/v1/grievances/{id}/followups` | Add citizen follow-up |
