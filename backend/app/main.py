@@ -199,7 +199,11 @@ async def health():
         db.execute("SELECT 1")
     return {"status": "ok", "service": "samadhan-setu-api", "version": "1.0.0", "storage": "sqlite"}
 
-@app.get("/api/v1/resources")\nasync def resources():\n    return OFFICIAL_RESOURCES\n\n@app.get("/api/v1/categories")
+@app.get("/api/v1/resources")
+async def resources():
+    return OFFICIAL_RESOURCES
+
+@app.get("/api/v1/categories")
 async def categories():
     return [{"id": key, "name": label} for key, label, _ in CATEGORY_RULES] + [{"id": "needs_review", "name": "Needs clarification"}]
 
