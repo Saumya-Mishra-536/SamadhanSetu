@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import type { User } from '@supabase/supabase-js'
 import { supabase, supabaseConfigured } from './supabase'
 import { useLanguage } from './i18n'
+import { listGrievances } from './data'
 
 export function useCurrentUser() {
   const [user, setUser] = useState<User | null>(null)
@@ -116,12 +117,24 @@ export function ProfilePage() {
     }
     setBusy(false)
   }
+  async function exportData() {
+    setBusy(true); setError(''); setNotice('')
+    try {
+      const grievances = await listGrievances()
+      const payload = { exported_at: new Date().toISOString(), account: { email: user?.email, full_name: name, preferred_language: localStorage.getItem('samadhan-language') }, grievances }
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a'); link.href = url; link.download = 'samadhan-setu-my-data.json'; link.click(); URL.revokeObjectURL(url)
+      setNotice('Your account records export has been prepared.')
+    } catch (err) { setError(err instanceof Error ? err.message : 'Unable to export records.') }
+    finally { setBusy(false) }
+  }
   async function signOut() { if (supabase) { await supabase.auth.signOut(); window.location.href='/' } }
   if (loading) return <main className="page-wrap"><p>Loading account…</p></main>
   if (!user) return <main className="page-wrap"><section className="form-card"><h1>Sign in required</h1><p>Sign in to manage your profile.</p><Link className="button primary" to="/login">Sign in</Link></section></main>
   return <main className="page-wrap account-wrap"><section className="form-card account-card"><div className="eyebrow">ACCOUNT SETTINGS</div><h1>{t.profileTitle}</h1>{recovery&&<form onSubmit={updatePassword}><label>New password<input type="password" minLength={8} value={newPassword} onChange={e=>setNewPassword(e.target.value)} required/></label><button className="button primary" disabled={busy}>Update password</button></form>}
     <div className="avatar-row">{avatar?<img src={avatar} alt="Profile" className="avatar-preview"/>:<div className="avatar-placeholder">{name.slice(0,1).toUpperCase()||'S'}</div>}<div><b>{t.avatar}</b><label className="upload-label">{t.upload}<input type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>upload(e.target.files?.[0])} disabled={busy}/></label><small>JPG, PNG or WebP · 2 MB maximum</small></div></div>
     <form onSubmit={save}><label>{t.name}<input value={name} onChange={e=>setName(e.target.value)} maxLength={100}/></label><label>{t.email}<input value={user.email??''} disabled/></label><label>{t.phone}<input type="tel" value={phone} onChange={e=>setPhone(e.target.value)} maxLength={20}/></label><button className="button primary" disabled={busy}>{t.save}</button></form>
-    {notice&&<p className="success-msg">{notice}</p>}{error&&<p className="error">{error}</p>}<button className="button secondary signout" onClick={signOut}>{t.signOut}</button>
+    {notice&&<p className="success-msg">{notice}</p>}{error&&<p className="error">{error}</p>}<div className="profile-actions"><button className="button secondary" onClick={exportData} disabled={busy}>Export my data (JSON)</button><button className="button secondary signout" onClick={signOut}>{t.signOut}</button></div><p className="helper">You can delete individual grievance records from their detail page. Full account deletion is not yet available.</p>
   </section></main>
 }
