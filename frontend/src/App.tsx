@@ -3,7 +3,7 @@ import { Link, Route, Routes, useNavigate, useParams } from 'react-router-dom'
 
 type Followup = { id: string; note: string; status: string; reference_number?: string | null }
 type Grievance = { id: string; description: string; location: string; classification: { category_id: string; category: string; confidence: string; explanation: string }; guidance: { next_steps: string[]; documents: string[] }; complaint_draft: string; status: string; created_at: string; followups: Followup[] }
-const API = '/api/v1'
+const API = (import.meta.env.VITE_API_BASE_URL || '') + '/api/v1'
 const dateLabel = (date: string) => new Date(date).toLocaleString()
 
 function Shell({children}:{children:React.ReactNode}) {
