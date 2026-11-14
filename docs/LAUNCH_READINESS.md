@@ -27,7 +27,7 @@ Samadhan Setu is an independent civic-assistance platform. It is not a governmen
 - The Insights page shows only the signed-in user's own records. It is not a population-level dashboard.
 - The account UI is a first implementation and requires end-to-end testing against a real Supabase project.
 - Scheme catalogue ingestion, source freshness checks and scheme-specific eligibility rules are not yet implemented.
-- AI assistant retrieval, citations, abuse controls, privacy review and model-provider configuration are not yet implemented.
+- The assistant has JWT verification, a per-user quota and sensitive-identifier screening, but no live retrieval, document RAG or guaranteed citations. Model-provider secrets and exact origin must be configured by the operator; a formal privacy review is outstanding.
 - No independent security assessment, accessibility audit, screen-reader test, load test or production monitoring has been completed.
 - A JSON export of the signed-in user's grievance records is available in profile settings. Full account deletion and automated retention enforcement remain outstanding.
 
