@@ -1,46 +1,90 @@
 # Vercel deployment notes
 
-## Frontend preview
+## Hosted frontend
 
-The React/Vite frontend is configured as a Vercel static site.
+The hosted frontend is a React + TypeScript + Vite single-page application. It uses Supabase directly for authentication and hosted grievance data; it does **not** call the legacy FastAPI + SQLite API.
 
-1. Import `Saumya-Mishra-536/SamadhanSetu` in the Vercel dashboard.
-2. Set **Root Directory** to `frontend`.
-3. Framework preset: **Vite**.
-4. Build command: `npm run build`.
-5. Output directory: `dist`.
-6. Deploy a Preview first and inspect the pages on desktop and mobile.
+In Vercel, import `Saumya-Mishra-536/SamadhanSetu` and configure:
 
-If the API is deployed on a separate origin, set the frontend environment variable:
+1. **Root Directory:** `frontend`
+2. **Framework Preset:** Vite
+3. **Build Command:** `npm run build`
+4. **Output Directory:** `dist`
+5. **Environment variables** for Preview and Production:
+   - `VITE_SUPABASE_URL` — Supabase project URL
+   - `VITE_SUPABASE_ANON_KEY` — Supabase publishable/anon key
 
-- `VITE_API_BASE_URL` = the backend origin, for example `https://your-api.example` (no trailing slash).
+The repository's `frontend/vercel.json` also declares the Vite framework, build command, output directory and SPA fallback rewrite. Vercel project settings still need to be checked against these values. Vercel applies changed build settings on the next deployment; trigger a redeploy after changing environment variables or project settings. See [Vercel build configuration](https://vercel.com/docs/builds/configure-a-build) and [Vite on Vercel](https://vercel.com/docs/frameworks/frontend/vite).
 
-The frontend expects API routes under `/api/v1`.
+## Supabase setup — required before hosted user testing
 
-## Backend and data safety — deployment blocker
+Apply these migrations to the intended Supabase project, in this exact order:
 
-The current backend stores grievance records in a local SQLite file. Vercel Functions are serverless and do not provide a durable writable application filesystem. A local SQLite file must **not** be treated as persistent storage on Vercel. The current API also has no authentication or per-user authorisation; publishing it as-is would allow one visitor to read or alter another visitor's grievance records.
+1. `supabase/migrations/202611140001_initial_security.sql`
+2. `supabase/migrations/202611140002_server_taxonomy_and_hardening.sql`
 
-Therefore, do not connect a public frontend to the current write-enabled API and do not use real personal information in a hosted demo.
+Then verify in the Supabase dashboard:
+- Tables exist: `profiles`, `grievances`, `followups`, `assistant_rate_limits`, `service_taxonomy`, `authority_directory`, `grievance_audit_log`, and `grievance_evidence`.
+- RLS is enabled and policies are present for user-owned records.
+- Private Storage buckets exist: `avatars` and `grievance-evidence`.
+- Storage object policies restrict each user's objects to their own user-ID folder.
+- Seeded authority directory records remain `unverified` until a human has checked the current official source and recorded provenance.
 
-Before enabling public submissions, complete all of the following:
+Configure Supabase Auth Site URL and redirect allowlist for the real production domain and local development. Test email confirmation and password reset with real test inboxes. Do not use production citizen data for these checks.
 
-1. Move grievance and follow-up storage to a managed persistent database (for example, managed Postgres).
-2. Add authentication and enforce record ownership on every read, update and delete endpoint.
-3. Configure the backend's CORS allowlist for the exact deployed frontend origin.
-4. Add rate limiting, request-size limits, secret management, retention/deletion policy and a privacy notice.
-5. Deploy the FastAPI backend to a Vercel Python Function (or another suitable API host), set the database connection as a server-side environment variable, and test create/read/update/delete flows with two separate test accounts.
+## Optional assistant Edge Function
 
-A Vercel deployment of the frontend alone is a **visual preview**, not a fully working hosted grievance service. No government submission, live status integration or official affiliation is implied.
+The frontend assistant calls the Supabase function `citizen-assistant`. If you intend to show this feature in the deployed demo:
 
-## Local validation
+1. Link the Supabase CLI to the intended project.
+2. Deploy the function:
+   ```bash
+   supabase functions deploy citizen-assistant
+   ```
+3. Configure these Supabase function secrets:
+   ```bash
+   supabase secrets set OPENAI_API_KEY=...
+   supabase secrets set OPENAI_MODEL=gpt-4.1-mini
+   supabase secrets set APP_ORIGIN=https://your-real-production-host
+   ```
+4. Set `APP_ORIGIN` to the exact browser origin, including scheme and any required port; do not include a path or trailing slash.
+5. Test assistant requests from the actual deployed site, including a request from a deliberately different origin.
 
-From the repository root:
+The function has no live web retrieval, official-document RAG, guaranteed citations, scheme eligibility engine or government status access. Do not describe it as a live government-data agent.
 
-```bash
-cd frontend
-npm ci
-npm run build
-```
+## Mandatory live verification
 
-Vercel's current FastAPI deployment guide: https://vercel.com/kb/guide/ship-a-fastapi-app-on-vercel
+Use fictional test data only. Before accepting any real citizen information, complete all of the following:
+
+- [ ] Sign up and receive/complete email confirmation.
+- [ ] Sign in, sign out and password reset.
+- [ ] Update profile details and upload/read/replace/delete a profile photo.
+- [ ] Create a grievance draft in English and Hindi.
+- [ ] Confirm server-side keyword classification and the `needs_review` fallback.
+- [ ] Correct the category and confirm the change persists after refresh.
+- [ ] Edit and save the complaint draft.
+- [ ] Add and view a citizen-entered follow-up note.
+- [ ] Export the signed-in user's records as JSON.
+- [ ] Delete an individual grievance and confirm its follow-ups are removed.
+- [ ] Test account isolation with two separate users: account B must not read, update or delete account A's grievance, follow-ups, profile or Storage objects.
+- [ ] Confirm assistant requests work from the production origin and are rejected from a different origin.
+- [ ] Confirm no seeded authority entry is displayed as verified without documented human review.
+
+A successful Vite build or GitHub Actions run does not validate the live Supabase migration, Auth configuration, Storage policies, Edge Function secrets or RLS isolation.
+
+## Legacy local backend — do not deploy publicly
+
+The repository retains a FastAPI + SQLite service for local development and backend tests. It has no multi-user authentication and the SQLite database is local-file storage. It is **not** the hosted backend and must not be exposed as a public service or connected to the public Vercel frontend.
+
+## Public launch blockers
+
+Before a public pilot with real citizen data:
+- Complete the live two-account security and Storage isolation checks.
+- Complete qualified legal review of the privacy notice, consent and applicable DPDP requirements.
+- Publish a named platform grievance contact and monitored email address.
+- Establish a lawful retention, deletion, backup and incident-response process.
+- Human-verify every authority link and its scope; retain provenance and a real check date.
+- Complete accessibility and screen-reader testing; do not claim WCAG/GIGW certification without an audit.
+- Use a clear public disclaimer and do not imply official government affiliation.
+
+The current build is a limited Bihar-focused navigation prototype with a few central-government starting links, not a comprehensive grievance service.
