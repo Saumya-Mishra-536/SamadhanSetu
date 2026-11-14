@@ -67,3 +67,9 @@ $$;
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created after insert on auth.users
 for each row execute procedure public.handle_new_user();
+
+
+-- Structured grievance fields used by the citizen dashboard.
+alter table public.grievances add column if not exists classification jsonb not null default '{}'::jsonb;
+alter table public.grievances add column if not exists guidance jsonb not null default '{}'::jsonb;
+alter table public.followups add column if not exists status text not null default 'Citizen-recorded update';
