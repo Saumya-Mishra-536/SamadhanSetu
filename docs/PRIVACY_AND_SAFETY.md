@@ -10,3 +10,13 @@ This is a hackathon prototype, not a government service or secure public case-ma
 - Never fabricate responsible officers, contact numbers, portal URLs, legal deadlines or resolution outcomes.
 - The app does not submit complaints to external portals.
 - Before public launch: implement authentication, user-scoped authorisation, rate limits, audit logging, secure deployment secrets, retention/deletion workflows and a privacy notice reviewed for applicable law.
+
+## Official grievance resources
+
+The application includes a small source-linked directory for Bihar and central-government grievance channels. Each entry displays its jurisdiction, official URL, source URL and the date checked. The directory is navigational only: it does not infer that a portal is responsible for an individual case and does not transfer the user's grievance data.
+
+Sources checked on 14 November 2026:
+- Bihar Lok Shikayat portal and Act information: https://lokshikayat.bihar.gov.in/DefaultEn.aspx and https://lokshikayat.bihar.gov.in/AboutUsEn.aspx
+- Bihar Sahyog RTMS: https://sahyog.bihar.gov.in/Sahyog/Default.aspx
+- Bihar UPYOG citizen services: https://upyog.bihar.gov.in/c/citizen-services
+- Government of India CPGRAMS: https://pgportal.gov.in/V7/Home
