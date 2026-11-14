@@ -32,7 +32,7 @@ These items are code present in the repository. They must still be configured an
 
 - [ ] Sign-up and email confirmation.
 - [ ] Sign-in, sign-out and password reset.
-- [ ] Profile edit and avatar upload/read/replace/delete.
+- [ ] Profile edit and avatar upload/read (avatar-object cleanup is not exposed in the UI).
 - [ ] Grievance creation in English and Hindi.
 - [ ] Server-side keyword classification, including the no-match fallback.
 - [ ] Category correction and persistence after refresh.
