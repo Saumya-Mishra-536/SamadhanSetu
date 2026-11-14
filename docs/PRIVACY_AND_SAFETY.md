@@ -22,7 +22,7 @@ Do not accept real citizen data until the operator has:
 
 ## Retention and deletion
 
-Citizens can delete individual grievance records from the app. A complete account-deletion workflow, automated retention enforcement and formal data-export feature are not yet implemented. The new grievance schema sets a review timestamp 365 days after creation; this is a review marker, not an automatic deletion policy. The operator must establish and publish a lawful retention schedule before public use.
+Citizens can delete individual grievance records from the app. A JSON export of the signed-in user's grievance records is available. A complete account-deletion workflow and automated retention enforcement are not yet implemented. The new grievance schema sets a review timestamp 365 days after creation; this is a review marker, not an automatic deletion policy. The operator must establish and publish a lawful retention schedule before public use.
 
 ## Legal review
 
