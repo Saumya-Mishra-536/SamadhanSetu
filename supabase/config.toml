@@ -1,0 +1,4 @@
+project_id = "samadhan-setu"
+
+[functions.citizen-assistant]
+verify_jwt = true
