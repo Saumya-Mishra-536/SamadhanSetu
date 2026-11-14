@@ -1,28 +1,41 @@
 # Samadhan Setu 🇮🇳
 ### Awaaz se Samadhan tak.
 
-**A citizen-first public grievance navigation prototype.**
+**An independent citizen-first public grievance navigation prototype.**
 
-Samadhan Setu is an independent civic-assistance and navigation platform. It helps people organise a public-service concern, understand a preliminary category suggestion, prepare an editable complaint draft, and record their own follow-up notes. It is not a government complaint portal.
+Samadhan Setu helps people organise a public-service concern, review a preliminary category suggestion, prepare an editable complaint draft, and record their own follow-up notes. It is not a government complaint portal and is not affiliated with or endorsed by any government department.
 
-> **Honest MVP scope:** The local prototype uses deterministic keyword categorisation and general checklists. The hosted branch now runs a more specific deterministic taxonomy in PostgreSQL. Neither path is a trained LLM classifier, authority determination or official grievance channel. The app does not submit complaints, verify live government status or guarantee resolution.
+> **Honest MVP scope:** Classification is deterministic keyword matching. The hosted version runs its taxonomy in PostgreSQL; the local prototype has its own rule-based classifier. There is no trained LLM classifier, agent orchestrator, official-document RAG, live scheme-data integration, eligibility engine, verified jurisdiction router, government complaint submission, or live grievance-status tracking. The current pilot is focused on Bihar navigation, with a small number of central-government starting links; this is not comprehensive coverage of Bihar or India.
 
+## Current repository status
 
-## Hosted platform foundation (in progress)
+The hosted application foundation is on the default `main` branch. It uses:
+- React + TypeScript + Vite for the frontend.
+- Supabase Auth and PostgreSQL with row-level security for hosted accounts and grievance records.
+- Private Supabase Storage buckets for profile photos and a prepared evidence-storage foundation.
+- A guarded Supabase Edge Function for an authenticated conversational assistant.
 
-The `feat/launch-platform-foundation` branch adds a Supabase-backed account and citizen-record foundation:
-- Email/password authentication, email confirmation and password reset request.
-- Profile settings and private profile-photo uploads.
-- English/Hindi language preference and partial bilingual screens (not yet a full translation of every control and message).
-- User-scoped grievance, follow-up and profile tables protected by Supabase row-level security.
-- Server-side PostgreSQL taxonomy and deterministic categorisation with broad citizen correction, jurisdiction hints and unverified authority-directory entries.
-- Bilingual privacy, terms, accessibility, disclaimer and help pages; skip navigation, focus styles, text-size/contrast controls and JSON data export.
-- Scheme discovery links to the official myScheme directory and its official eligibility engine.
-- An authenticated AI assistant Edge Function with strict limits against invented eligibility decisions or government status.
+The hosted foundation is **not production-ready until an operator configures a real Supabase project, applies both migrations, configures Auth and Vercel, deploys the Edge Function if it will be used, and completes live end-to-end and account-isolation testing**. A successful frontend build does not prove the live database policies or deployment work.
 
-See [launch readiness](docs/LAUNCH_READINESS.md) for setup and remaining work. This branch is not production-ready until a real Supabase project is configured, migrations and Edge Function are deployed, full interface translations are completed, and end-to-end security/accessibility testing passes. The assistant does not yet perform live scheme retrieval; official myScheme is the current source of scheme discovery and eligibility results. The new second migration must be applied after the initial security migration.
+See [launch readiness](docs/LAUNCH_READINESS.md), [Vercel deployment notes](docs/VERCEL_DEPLOYMENT.md), and [privacy and safety](docs/PRIVACY_AND_SAFETY.md).
 
-## Run without Docker
+## What the hosted foundation contains
+
+- Email/password sign-up and sign-in, email confirmation and password-reset UI.
+- Profile editing and private profile-photo upload UI.
+- English/Hindi language selection with partial translations; this is not a complete Hindi translation.
+- User-scoped grievance records and follow-up notes protected by Supabase RLS.
+- Server-side PostgreSQL keyword taxonomy and citizen category correction.
+- Preliminary jurisdiction hints only; these are not authority determinations.
+- An authority directory whose seeded entries are marked unverified until a human checks and records their provenance.
+- Bilingual privacy, terms, accessibility, disclaimer and help pages.
+- Keyboard skip navigation, visible focus styles, text-size and contrast controls.
+- JSON export of the signed-in user's grievance records.
+- A guarded assistant Edge Function. It has no live retrieval, RAG, guaranteed source citations or scheme eligibility engine.
+
+The evidence bucket and metadata table are prepared, but there is no evidence-upload UI. Full account deletion and automatic retention enforcement are not implemented. The Insights page displays only the signed-in user's own records; it is not a population-level dashboard.
+
+## Run the local prototype
 
 Requirements: Python 3.11+ and Node.js 20+.
 
@@ -61,44 +74,59 @@ npm install
 npm run dev
 ```
 
-## Current hosted branch status
+## Local prototype capabilities
 
-The hosted UI in `feat/launch-platform-foundation` uses Supabase Auth and Supabase Postgres for user-scoped grievance records. The FastAPI + SQLite app remains a local prototype and is not part of the Vercel hosted path. Do not expose the SQLite API to the public internet.
+The legacy FastAPI + SQLite prototype supports:
+- Grievance draft creation with description, location and language.
+- Rule-based preliminary categorisation, including selected Hindi keywords.
+- Citizen category correction and general next-step/document checklists.
+- Editable complaint drafts and copy support.
+- SQLite persistence, citizen-entered follow-up notes and reference numbers.
+- Local analytics with explicit scope caveats.
+- OpenAPI documentation and automated backend API tests.
 
-## What works in the local prototype
+The local SQLite app has no authentication or multi-user isolation. Keep it local; **do not expose the FastAPI/SQLite API as a public multi-user service**. The hosted Vercel frontend talks directly to Supabase and does not use this API.
 
-- Grievance submission with description, location, language selection and prototype acknowledgement.
-- Preliminary classification across six public-service categories, including selected Hindi keywords.
-- Citizen correction of the suggested category.
-- Category-specific general next-step and document checklists.
-- Editable complaint draft and copy support.
-- SQLite persistence: records survive browser refreshes and backend restarts.
-- Citizen-recorded follow-up notes and reference numbers.
-- Local database analytics with explicit scope caveats.
-- Interactive OpenAPI documentation and automated API tests.
+## Privacy and safety
 
-## Storage and privacy
+Do not enter Aadhaar/PAN numbers, bank details, passwords, OTPs or unnecessary sensitive information. Do not use this prototype for emergencies or legal decisions. A saved grievance is a private draft, not an officially submitted complaint. Users must verify the correct department, current process, eligibility and jurisdiction through official sources and submit any complaint themselves.
 
-The local prototype stores data in `backend/data/samadhan.db` and has no authentication or multi-user isolation. The hosted branch uses Supabase with row-level security, but must not accept real citizen data until the migration, storage policies, Auth redirects and cross-account isolation have been tested in the deployed project. Do not enter Aadhaar numbers, bank details, passwords, OTPs or unnecessary sensitive information.
+Do not accept real citizen data in a hosted deployment until both migrations are applied, Auth and Storage are configured, and cross-account read/update/delete tests pass. The privacy notice and terms are prototype disclosures, not a legal compliance certification. A qualified DPDP review and a named, monitored platform grievance contact are still required before public launch.
 
 ## What is not implemented
 
-- No trained LLM/agent or claim of AI-powered reasoning.
-- No verified local authority directory or official portal recommendations.
-- No live government API, complaint submission or status tracking.
-- No verified authority assignment engine or live source retrieval; jurisdiction hints are not authority determinations.
-- No evidence upload or official-document RAG.
-- Hindi/English support is partial; some detail labels, help text and assistant responses still need a complete language QA pass.
+- LLM-based classification, agent orchestration or trace logging.
+- Official-document RAG, retrieval evaluation or guaranteed citations.
+- Live scheme data, scheme-specific eligibility calculation or authorised government API integration.
+- Deterministic district/urban-rural/department jurisdiction routing.
+- Automatic government complaint submission or live status tracking.
+- Human-verified comprehensive authority directory.
+- Evidence upload, complete account deletion or automatic retention enforcement.
+- Full Hindi translation and language-specific evaluation.
+- Population-level insights with privacy-preserving minimum group sizes.
+- Frontend end-to-end tests, production monitoring or independent security/accessibility audits.
 
-## Vercel preview
+## Vercel deployment
 
-The Vite frontend is configured for Vercel with the project root set to `frontend`. Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` to Vercel and apply both Supabase migrations before testing hosted sign-in and records. The hosted frontend talks directly to Supabase; it does not use the local SQLite API. Do not deploy or expose the legacy FastAPI/SQLite service as a public multi-user backend. Deployment instructions and safety checklist are in [docs/VERCEL_DEPLOYMENT.md](docs/VERCEL_DEPLOYMENT.md).
+The frontend is configured for Vercel with the project **Root Directory** set to `frontend`, build command `npm run build`, and output directory `dist`.
+
+Set these Vercel environment variables for the relevant Preview/Production environments:
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+
+Apply the Supabase migrations in order:
+1. `supabase/migrations/202611140001_initial_security.sql`
+2. `supabase/migrations/202611140002_server_taxonomy_and_hardening.sql`
+
+Configure Supabase Auth redirect URLs for the real deployed domain. If enabling the assistant, deploy `supabase/functions/citizen-assistant` and configure `OPENAI_API_KEY`, `OPENAI_MODEL`, and the exact `APP_ORIGIN` as Supabase function secrets. Never put service-role keys or provider secrets in Vite variables or commit them to Git.
+
+A frontend deployment without a configured Supabase project is only a non-sensitive preview. Follow [docs/VERCEL_DEPLOYMENT.md](docs/VERCEL_DEPLOYMENT.md) and [docs/LAUNCH_READINESS.md](docs/LAUNCH_READINESS.md).
 
 ## Architecture
 
-Hosted UI: React + TypeScript + Vite on Vercel → Supabase Auth + Postgres/RLS + private Storage. The assistant Edge Function is optional and requires separate deployment/secrets.
+**Hosted:** React + TypeScript + Vite on Vercel → Supabase Auth + PostgreSQL/RLS + private Storage. Optional assistant: Supabase Edge Function → configured model provider.
 
-Local prototype only: React + TypeScript + Vite → FastAPI → SQLite. It is retained for offline development and tests; do not connect it to a public deployment.
+**Local prototype only:** React + TypeScript + Vite → FastAPI → SQLite.
 
 See [architecture](docs/ARCHITECTURE.md), [privacy and safety](docs/PRIVACY_AND_SAFETY.md), and [demo script](docs/DEMO_SCRIPT.md).
 
@@ -117,7 +145,7 @@ See [architecture](docs/ARCHITECTURE.md), [privacy and safety](docs/PRIVACY_AND_
 | POST | `/api/v1/grievances/{id}/followups` | Add citizen follow-up |
 | GET | `/api/v1/analytics/overview` | Local analytics |
 
-## Development
+## Development and validation
 
 Backend tests:
 
@@ -130,28 +158,25 @@ Frontend production build:
 
 ```bash
 cd frontend
-npm install
+npm ci
 npm run build
 ```
 
-GitHub Actions runs both checks on pushes and pull requests to main.
+The current frontend package does not include a browser-test framework. CI build success is not a substitute for live Auth, RLS, Storage, or browser-flow tests.
 
 ## Roadmap
 
-- [x] Standalone local setup without Docker or a database server
-- [x] SQLite persistence
-- [x] Six-category rule-based classification and selected Hindi keywords
-- [x] Citizen category correction
-- [x] Source-linked official grievance resources for Bihar and central-government channels
-- [x] Local record deletion
-- [x] Complaint draft and follow-up workflow
-- [x] API tests and CI
-- [x] Email/password authentication and user-scoped hosted records with RLS (requires operator setup and deployment tests)
+- [x] Local FastAPI + SQLite prototype and backend API tests
+- [x] Hosted Supabase schema and RLS foundation (operator setup and live verification still required)
+- [x] Email/password authentication and user-scoped hosted records (live deployment tests still required)
+- [ ] Apply migrations and verify RLS/Storage in a real Supabase project
+- [ ] Deploy and test the hosted frontend and optional assistant
 - [ ] Human-verified authority directory with source provenance
-- [ ] Official-source retrieval with citations
 - [ ] Full Hindi/English translation and language-specific evaluation
-- [x] Supabase hosted database schema and RLS foundation (operator must apply migrations and verify)
-- [ ] Security review, accessibility audit and fully functional hosted deployment
+- [ ] Official-source retrieval/RAG with citations and evaluation
+- [ ] Scheme data integration through authorised APIs
+- [ ] Security review, accessibility audit, frontend tests and production monitoring
+- [ ] Complete account deletion and retention enforcement
 
 ## License
 
