@@ -69,7 +69,9 @@ export function ProfilePage() {
   useEffect(() => {
     setName(String(user?.user_metadata?.full_name ?? ''))
     setPhone(String(user?.user_metadata?.phone ?? ''))
-    setAvatar(String(user?.user_metadata?.avatar_url ?? ''))
+    const path = String(user?.user_metadata?.avatar_path ?? '')
+    if (path && supabase) supabase.storage.from('avatars').createSignedUrl(path, 3600).then(({ data }) => setAvatar(data?.signedUrl ?? ''))
+    else setAvatar('')
   }, [user])
   async function save(e: React.FormEvent) {
     e.preventDefault(); if (!supabase || !user) return
@@ -86,10 +88,13 @@ export function ProfilePage() {
     const { error: uploadError } = await supabase.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type })
     if (uploadError) setError(uploadError.message)
     else {
-      const { data } = supabase.storage.from('avatars').getPublicUrl(path)
-      const { error: updateError } = await supabase.auth.updateUser({ data: { avatar_url: data.publicUrl } })
-      if (updateError) setError(updateError.message)
-      else { setAvatar(data.publicUrl); setNotice('Profile photo updated.') }
+      const { data, error: signedError } = await supabase.storage.from('avatars').createSignedUrl(path, 3600)
+      if (signedError) setError(signedError.message)
+      else {
+        const { error: updateError } = await supabase.auth.updateUser({ data: { avatar_path: path } })
+        if (updateError) setError(updateError.message)
+        else { setAvatar(data.signedUrl); setNotice('Profile photo updated.') }
+      }
     }
     setBusy(false)
   }
