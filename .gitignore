@@ -1,24 +1,25 @@
 # Python
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
+.venv/
+venv/
 .env
 .env.*
-venv/
-.envrc
+.pytest_cache/
+
+# Local application data
+backend/data/
+*.db
+*.sqlite
+*.sqlite3
 
 # Node
 node_modules/
 dist/
 *.local
 
-# IDE
+# IDE / OS
 .vscode/
 .idea/
-
-# Docker
-docker-compose.override.yml
-
-# Misc
 .DS_Store
 .codenow/
