@@ -31,10 +31,11 @@ function makeDraft(description:string,location:string,classification:{category:s
 }
 function requireClient(){if(!supabase)throw new Error('Supabase is not configured. Add the public project URL and anon key.');return supabase}
 function unwrap<T>(result:{data:T|null;error:{message:string}|null}):T {if(result.error)throw new Error(result.error.message);if(result.data===null)throw new Error('No data returned');return result.data}
-export async function createGrievance(description:string,location:string,language:string) {
+export async function createGrievance(description:string,location:string,language:string,consent:boolean) {
+  if(!consent) throw new Error('Please acknowledge the data-storage notice before saving this record.')
   const db=requireClient();const {data:{user}}=await db.auth.getUser();if(!user)throw new Error('Sign in to save a grievance.')
   const classification=classify(description),created=new Date().toISOString(),guide=guidance(classification.category_id)
-  const result=await db.from('grievances').insert({user_id:user.id,description,location,language,category_id:classification.category_id,classification,guidance:guide,complaint_draft:makeDraft(description,location,classification,created),status:'Draft - not submitted to government'}).select('*, followups(*)').single()
+  const result=await db.from('grievances').insert({user_id:user.id,description,location,language,consent,category_id:classification.category_id,classification,guidance:guide,complaint_draft:makeDraft(description,location,classification,created),status:'Draft - not submitted to government'}).select('*, followups(*)').single()
   if(result.error) throw new Error(result.error.message)
   if(!result.data) throw new Error('Unable to save grievance.')
   return result.data as unknown as Grievance
