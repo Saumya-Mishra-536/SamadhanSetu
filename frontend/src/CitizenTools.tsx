@@ -11,10 +11,10 @@ export function SchemesPage() {
     { title: 'Central public grievance portal', titleHi: 'केंद्रीय लोक शिकायत पोर्टल', desc: 'Check the central portal scope and exclusions before submitting a grievance.', descHi: 'शिकायत दर्ज करने से पहले केंद्रीय पोर्टल का दायरा और अपवाद जाँचें।', url: 'https://pgportal.gov.in/V7/Home', tag: 'GOVERNMENT OF INDIA' },
   ]
   return <main className="page-wrap">
-    <section className="schemes-hero"><div className="eyebrow">SCHEME DISCOVERY · OFFICIAL SOURCES</div><h1>{t.schemesTitle}</h1><p>{t.schemesIntro}</p><a className="button primary" href="https://www.myscheme.gov.in/" target="_blank" rel="noreferrer">{t.openMyScheme}</a></section>
+    <section className="schemes-hero"><div className="eyebrow">SCHEME DISCOVERY · OFFICIAL SOURCES</div><h1>{t.schemesTitle}</h1><p>{t.schemesIntro}</p><div className="welcome-actions"><a className="button primary" href="https://www.myscheme.gov.in/" target="_blank" rel="noreferrer">{t.openMyScheme}</a><a className="button outline-light" href="https://rules.myscheme.gov.in/" target="_blank" rel="noreferrer">{t.eligibility} ↗</a></div></section>
     <div className="source-note">{t.officialOnly} Samadhan Setu does not determine or guarantee eligibility and does not submit scheme applications.</div>
     <div className="scheme-grid">{links.map((item)=><article className="scheme-card" key={item.url}><span className="scheme-tag">{item.tag}</span><h3>{language === 'hi' ? item.titleHi : item.title}</h3><p>{language === 'hi' ? item.descHi : item.desc}</p><a className="text-link" href={item.url} target="_blank" rel="noreferrer">Open official source ↗</a></article>)}</div>
-    <p className="helper">Scheme availability, benefits, documents and eligibility rules can change. Confirm the latest information on the official scheme page and the relevant department's website.</p>
+    <p className="helper">The eligibility link opens the Government of India myScheme eligibility engine. Samadhan Setu does not receive or store its result. Scheme availability, benefits, documents and eligibility rules can change; confirm the latest information on the official scheme page and relevant department's website.</p>
   </main>
 }
 
