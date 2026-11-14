@@ -3,7 +3,7 @@ import { useLanguage } from './i18n'
 import { supabase, supabaseConfigured } from './supabase'
 
 export function SchemesPage() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const links = [
     { title: 'Central and state government schemes', titleHi: 'केंद्र और राज्य सरकार की योजनाएँ', desc: 'Search schemes by your profile, state, category and eligibility criteria in the official myScheme directory.', descHi: 'आधिकारिक myScheme निर्देशिका में अपनी प्रोफ़ाइल, राज्य, श्रेणी और पात्रता के आधार पर योजनाएँ खोजें।', url: 'https://www.myscheme.gov.in/', tag: 'GOVERNMENT OF INDIA' },
     { title: 'Bihar citizen services', titleHi: 'बिहार नागरिक सेवाएँ', desc: 'Explore Bihar urban local-body citizen services and civic complaint channels.', descHi: 'बिहार के शहरी स्थानीय निकायों की नागरिक सेवाएँ और शिकायत चैनल देखें।', url: 'https://upyog.bihar.gov.in/c/citizen-services', tag: 'GOVERNMENT OF BIHAR' },
@@ -13,7 +13,7 @@ export function SchemesPage() {
   return <main className="page-wrap">
     <section className="schemes-hero"><div className="eyebrow">SCHEME DISCOVERY · OFFICIAL SOURCES</div><h1>{t.schemesTitle}</h1><p>{t.schemesIntro}</p><a className="button primary" href="https://www.myscheme.gov.in/" target="_blank" rel="noreferrer">{t.openMyScheme}</a></section>
     <div className="source-note">{t.officialOnly} Samadhan Setu does not determine or guarantee eligibility and does not submit scheme applications.</div>
-    <div className="scheme-grid">{links.map((item)=><article className="scheme-card" key={item.url}><span className="scheme-tag">{item.tag}</span><h3>{t===undefined?item.title:undefined}{/* translated below */}</h3><h3>{item.title}</h3><p>{item.desc}</p><a className="text-link" href={item.url} target="_blank" rel="noreferrer">Open official source ↗</a></article>)}</div>
+    <div className="scheme-grid">{links.map((item)=><article className="scheme-card" key={item.url}><span className="scheme-tag">{item.tag}</span><h3>{language === 'hi' ? item.titleHi : item.title}</h3><p>{language === 'hi' ? item.descHi : item.desc}</p><a className="text-link" href={item.url} target="_blank" rel="noreferrer">Open official source ↗</a></article>)}</div>
     <p className="helper">Scheme availability, benefits, documents and eligibility rules can change. Confirm the latest information on the official scheme page and the relevant department's website.</p>
   </main>
 }
