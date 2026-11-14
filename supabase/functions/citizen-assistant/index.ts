@@ -24,6 +24,16 @@ serve(async (req) => {
     if (!messages.length || messages.length > 8 || messages.some((m: any) => !["user", "assistant"].includes(m.role) || typeof m.content !== "string" || m.content.length > 1200)) {
       return Response.json({ error: "Invalid message history." }, { status: 400, headers: cors })
     }
+    const projectUrl = Deno.env.get("SUPABASE_URL")
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")
+    if (!projectUrl || !anonKey) return Response.json({ error: "Assistant backend is not configured." }, { status: 503, headers: cors })
+    const quotaResponse = await fetch(projectUrl + "/rest/v1/rpc/consume_assistant_quota", {
+      method: "POST",
+      headers: { apikey: anonKey, Authorization: auth, "Content-Type": "application/json" },
+      body: "{}",
+    })
+    if (!quotaResponse.ok) return Response.json({ error: "Unable to verify assistant usage limits." }, { status: 503, headers: cors })
+    if (await quotaResponse.json() !== true) return Response.json({ error: "You have reached the assistant limit. Please try again in a few minutes." }, { status: 429, headers: cors })
     const apiKey = Deno.env.get("OPENAI_API_KEY")
     if (!apiKey) return Response.json({ error: "The assistant has not been configured by the platform operator yet." }, { status: 503, headers: cors })
     const system = `You are Samadhan Setu's citizen information assistant. Respond in ${language}. Samadhan Setu is an independent service, not a government department. Be empathetic, concise and practical. You have NO live browsing, no access to government databases, no ability to submit applications, and no verified scheme-specific eligibility dataset. Never claim that you checked a live scheme, verified an applicant's eligibility, submitted a complaint, or checked grievance status. For scheme discovery or eligibility, direct the citizen to the official myScheme directory and explain that the scheme's official department makes the final decision. Do not invent benefit amounts, income thresholds, document lists, deadlines, helplines, application status or government contacts. Ask only for non-sensitive information; never request Aadhaar, OTP, bank details, passwords or full identity documents. When relevant, cite only these known official starting points and explain their scope: ${JSON.stringify(officialSources)}. If the source list does not answer the question, say so and direct the user to the relevant department's official website. For emergencies, direct users to local emergency services rather than this assistant. This is general navigation information, not legal advice or an official determination.`
