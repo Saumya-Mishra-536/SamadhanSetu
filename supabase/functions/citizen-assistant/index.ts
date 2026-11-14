@@ -20,7 +20,7 @@ serve(async (req) => {
   try {
     const body = await req.json()
     const messages = Array.isArray(body.messages) ? body.messages.slice(-8) : []
-    const sensitivePattern = /\\b(?:\\d{12}|\\d{10}|[A-Z]{5}\\d{4}[A-Z])\\b|\\b(?:otp|one[- ]time password|bank account|debit card|credit card|password)\\b/i
+    const sensitivePattern = /\b(?:\d{12}|\d{10}|[A-Z]{5}\d{4}[A-Z])\b|\b(?:otp|one[- ]time password|bank account|debit card|credit card|password)\b/i
     if (messages.some((m: any) => sensitivePattern.test(m.content))) {
       return Response.json({ error: "Please remove Aadhaar/PAN numbers, phone numbers, OTPs, passwords and banking details before sending your question." }, { status: 400, headers: cors })
     }
