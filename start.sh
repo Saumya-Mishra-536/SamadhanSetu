@@ -3,10 +3,19 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT"
 
-if ! command -v python3 >/dev/null 2>&1; then echo "Python 3 is required. Install Python 3.11 or newer."; exit 1; fi
+PYTHON_BIN=""
+for candidate in python3.12 python3.11 python3.13 python3.14 python3; do
+  if command -v "$candidate" >/dev/null 2>&1; then
+    if "$candidate" -c 'import sys; raise SystemExit(0 if (3, 11) <= sys.version_info[:2] < (3, 15) else 1)'; then
+      PYTHON_BIN="$candidate"
+      break
+    fi
+  fi
+done
+if [ -z "$PYTHON_BIN" ]; then echo "Python 3.11, 3.12, 3.13 or 3.14 is required."; exit 1; fi
 if ! command -v node >/dev/null 2>&1; then echo "Node.js 20 or newer is required. Install Node.js first."; exit 1; fi
 
-if [ ! -d "$ROOT/backend/.venv" ]; then python3 -m venv "$ROOT/backend/.venv"; fi
+if [ ! -d "$ROOT/backend/.venv" ]; then "$PYTHON_BIN" -m venv "$ROOT/backend/.venv"; fi
 "$ROOT/backend/.venv/bin/python" -m pip install --upgrade pip
 "$ROOT/backend/.venv/bin/pip" install -r "$ROOT/backend/requirements.txt"
 
