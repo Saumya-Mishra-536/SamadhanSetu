@@ -91,3 +91,11 @@ def test_grievance_survives_api_restart(tmp_path, monkeypatch):
         assert restored.status_code == 200
         assert restored.json()["id"] == grievance_id
     main.reset_store()
+
+def test_official_resources_have_provenance_and_jurisdiction(client):
+    response = client.get("/api/v1/resources")
+    assert response.status_code == 200
+    resources = response.json()
+    assert any(item["id"] == "central-cpgrams" for item in resources)
+    assert all(item["url"].startswith("https://") and item["source_url"].startswith("https://") for item in resources)
+    assert all(item["verified_on"] == "2026-11-14" for item in resources)
