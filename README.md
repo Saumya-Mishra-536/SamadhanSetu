@@ -73,6 +73,10 @@ This is a single-user local prototype with no authentication or user-scoped acce
 - No evidence upload or official-document RAG.
 - Language selection is recorded, but the interface and complaint generator are not fully multilingual.
 
+## Vercel preview
+
+The redesigned Vite dashboard includes a Vercel static-site configuration. Deployment instructions and the production safety checklist are in [docs/VERCEL_DEPLOYMENT.md](docs/VERCEL_DEPLOYMENT.md). The frontend can be deployed as a visual preview; the current SQLite API is not ready for public multi-user submissions because Vercel storage is ephemeral and the API has no authentication or record ownership.
+
 ## Architecture
 
 ```text
@@ -135,7 +139,8 @@ GitHub Actions runs both checks on pushes and pull requests to main.
 - [ ] Verified authority directory with source provenance
 - [ ] Official-source retrieval with citations
 - [ ] Fully multilingual interface and evaluation
-- [ ] Security review and hosted deployment
+- [ ] Persistent hosted database, authentication and record-level authorisation
+- [ ] Security review and fully functional hosted deployment
 
 ## License
 
