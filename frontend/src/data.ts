@@ -7,14 +7,6 @@ export type Grievance = {
   guidance: { next_steps: string[]; documents: string[] };
   complaint_draft: string; status: string; created_at: string; followups: Followup[];
 }
-const categories: Record<string,{name:string;nameHi:string;terms:string[]}> = {
-  welfare:{name:'Welfare and Government Schemes',nameHi:'कल्याण और सरकारी योजनाएँ',terms:['pension','scholarship','ration','benefit','subsidy','scheme','पेंशन','छात्रवृत्ति','राशन','योजना']},
-  sanitation:{name:'Public Sanitation and Waste Management',nameHi:'सार्वजनिक स्वच्छता और कचरा प्रबंधन',terms:['garbage','waste','drain','sewage','cleaning','कचरा','नाली','सफाई']},
-  infrastructure:{name:'Public Infrastructure',nameHi:'सार्वजनिक बुनियादी ढाँचा',terms:['road','pothole','streetlight','footpath','सड़क','गड्ढा']},
-  utilities:{name:'Water and Electricity',nameHi:'पानी और बिजली',terms:['water','electricity','power cut','pipeline','पानी','बिजली']},
-  healthcare:{name:'Public Healthcare Services',nameHi:'सार्वजनिक स्वास्थ्य सेवाएँ',terms:['hospital','medicine','doctor','clinic','अस्पताल','दवा','डॉक्टर']},
-  administration:{name:'Public Administration and Citizen Services',nameHi:'लोक प्रशासन और नागरिक सेवाएँ',terms:['certificate','application','office','प्रमाण पत्र','आवेदन','कार्यालय']},
-}
 function guidance(id:string,language:string) {
   const common=['Verify the responsible office and current procedure on its official website.','Keep acknowledgement numbers and copies of your own submissions.']
   const specific:Record<string,string[]>={welfare:['Check the current scheme/application status using its official portal.','Review the scheme’s published eligibility and document requirements.'],sanitation:['Record the location and date the issue was observed.','Find the municipal or local-body complaint channel for your area.'],infrastructure:['Record the precise location and safety impact.','Check the relevant local-body or public-works website.'],utilities:['Identify the service provider and record relevant dates.','Use the provider’s official customer grievance channel.'],healthcare:['Avoid sharing unnecessary medical details.','For urgent medical needs, seek immediate local medical assistance.'],administration:['Record the application date and acknowledgement number.','Ask the responsible office whether any documents are missing.']}
@@ -30,8 +22,7 @@ function unwrap<T>(result:{data:T|null;error:{message:string}|null}):T {if(resul
 export async function createGrievance(description:string,location:string,language:string,consent:boolean) {
   if(!consent) throw new Error('Please acknowledge the data-storage notice before saving this record.')
   const db=requireClient();const {data:{user}}=await db.auth.getUser();if(!user)throw new Error('Sign in to save a grievance.')
-  const created=new Date().toISOString()
-  const result=await db.from('grievances').insert({user_id:user.id,description,location,language,consent,complaint_draft:'',status:'Draft - not submitted to government'}).select('*, followups(*)').single()
+  const result=await db.from('grievances').insert({user_id:user.id,description,location,language,consent,complaint_draft:'',status:'draft'}).select('*, followups(*)').single()
   if(result.error) throw new Error(result.error.message)
   if(!result.data) throw new Error('Unable to save grievance.')
   return result.data as unknown as Grievance
