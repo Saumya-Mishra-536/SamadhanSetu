@@ -32,7 +32,8 @@ values
 ('utilities','electricity','Water and Electricity','पानी और बिजली','Electricity supply','बिजली आपूर्ति',array['electricity','power cut',' बिजली','बिजली','कटौती'],'Verify the licensed distribution company and service area'),
 ('healthcare','public_health','Public Healthcare Services','सार्वजनिक स्वास्थ्य सेवाएँ','Public health facility','सरकारी स्वास्थ्य सुविधा',array['hospital','medicine','doctor','clinic','अस्पताल','दवा','डॉक्टर'],'Verify the responsible health facility and state health authority'),
 ('administration','certificates','Public Administration and Citizen Services','लोक प्रशासन और नागरिक सेवाएँ','Certificates and documents','प्रमाणपत्र और दस्तावेज़',array['certificate','birth certificate','caste certificate','प्रमाण पत्र','जन्म प्रमाणपत्र','जाति प्रमाणपत्र'],'Verify the issuing department and local jurisdiction'),
-('administration','other_citizen_service','Public Administration and Citizen Services','लोक प्रशासन और नागरिक सेवाएँ','Other citizen service','अन्य नागरिक सेवा',array['application','office','आवेदन','कार्यालय'],'Verify the responsible department and application process')
+('administration','other_citizen_service','Public Administration and Citizen Services','लोक प्रशासन और नागरिक सेवाएँ','Other citizen service','अन्य नागरिक सेवा',array['application','office','आवेदन','कार्यालय'],'Verify the responsible department and application process'),
+('needs_review','needs_review','Needs clarification','स्पष्टीकरण आवश्यक','More detail needed','अधिक जानकारी आवश्यक',array[]::text[],'Ask for clarification; do not infer an authority')
 on conflict (subcategory_id) do update set
   category_id=excluded.category_id, category_en=excluded.category_en, category_hi=excluded.category_hi,
   subcategory_en=excluded.subcategory_en, subcategory_hi=excluded.subcategory_hi,
