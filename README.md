@@ -7,6 +7,19 @@ Samadhan Setu helps people organise a public-service concern, understand a preli
 
 > **Honest MVP scope:** The current build uses transparent keyword-based categorisation (English and selected Hindi terms), general checklists, editable complaint drafts and citizen-entered follow-ups. It does not submit complaints, verify live government status, guarantee resolution, or claim to be a trained AI system.
 
+
+## Hosted platform foundation (in progress)
+
+The `feat/launch-platform-foundation` branch adds a Supabase-backed account and citizen-record foundation:
+- Email/password authentication, email confirmation and password reset request.
+- Profile settings and private profile-photo uploads.
+- English/Hindi language preference for the primary navigation, account and scheme-discovery screens.
+- User-scoped grievance, follow-up and profile tables protected by Supabase row-level security.
+- Scheme discovery links to the official myScheme directory and its official eligibility engine.
+- An authenticated AI assistant Edge Function with strict limits against invented eligibility decisions or government status.
+
+See [launch readiness](docs/LAUNCH_READINESS.md) for setup and remaining work. This branch is not production-ready until a real Supabase project is configured, migrations and Edge Function are deployed, full interface translations are completed, and end-to-end security/accessibility testing passes. The assistant does not yet perform live scheme retrieval; official myScheme is the current source of scheme discovery and eligibility results.
+
 ## Run without Docker
 
 Requirements: Python 3.11+ and Node.js 20+.
