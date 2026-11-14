@@ -40,6 +40,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(() => (localStorage.getItem('samadhan-language') === 'hi' ? 'hi' : 'en'))
   useEffect(() => { const client = supabase; if (client) client.auth.getUser().then(async ({ data }) => { if (data.user) { const { data: profile } = await client.from('profiles').select('preferred_language').eq('id', data.user.id).maybeSingle(); if (profile?.preferred_language === 'hi' || profile?.preferred_language === 'en') { localStorage.setItem('samadhan-language', profile.preferred_language); setLanguageState(profile.preferred_language) } } }) }, [])
   const setLanguage = (next: Language) => { localStorage.setItem('samadhan-language', next); setLanguageState(next); const client = supabase; if (client) client.auth.getUser().then(({ data }) => { if (data.user) void client.from('profiles').upsert({ id: data.user.id, preferred_language: next }) }) }
+  useEffect(() => { document.documentElement.lang = language === 'hi' ? 'hi' : 'en' }, [language])
   const value = useMemo(() => ({ language, setLanguage, t: messages[language] }), [language])
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>
 }
