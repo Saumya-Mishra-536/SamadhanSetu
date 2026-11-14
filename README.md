@@ -3,47 +3,42 @@
 
 **A citizen-first public grievance navigation prototype.**
 
-Samadhan Setu helps people organise a public-service concern, understand a preliminary category suggestion, prepare an editable complaint draft, and record their own follow-up notes.
+Samadhan Setu helps people organise a public-service concern, understand a preliminary category suggestion, prepare an editable complaint draft, and record their own follow-up notes. It is an assistance layer—not a government complaint portal.
 
-> **Important:** This repository currently provides a hackathon MVP/prototype. It does not submit complaints to government systems, verify live grievance status, or guarantee action or resolution. Category suggestions use transparent keyword rules, not a trained model. Guidance is general and must be checked against official sources for the user's jurisdiction.
+> **Honest MVP scope:** The current build uses transparent keyword-based categorisation (English and selected Hindi terms), general checklists, editable complaint drafts and citizen-entered follow-ups. It does not submit complaints, verify live government status, guarantee resolution, or claim to be a trained AI system.
 
-## What works in this MVP
+## Run without Docker
 
-- Grievance submission with description, location, language and consent acknowledgement.
-- Preliminary keyword-based classification across six public-service categories.
-- Category-specific general next-step and document checklists.
-- Editable complaint draft with copy support.
-- Session-level grievance list and citizen-recorded follow-up notes.
-- Basic session analytics with a clear warning that these are not population statistics.
-- OpenAPI documentation at `/docs`.
+Requirements: Python 3.11+ and Node.js 20+.
 
-## Current limitations
-
-- Records are held in backend memory and are lost when the API restarts.
-- PostgreSQL + pgvector service is included in Docker Compose for the next persistence/RAG phase, but the current MVP API does not yet persist to it.
-- No live authority directory, official-source retrieval, government portal integration, authentication, file upload, or LLM agent is implemented.
-- The demo uses English interface text; the language field records the user's selection but does not yet translate or process all Indian languages.
-- Do not enter Aadhaar, bank details, passwords or unnecessary sensitive information.
-
-## Run locally with Docker
-
-Prerequisites: Docker Desktop running.
+### Quick start (Mac/Linux)
 
 From the repository root:
 
 ```bash
-docker compose up --build
+bash start.sh
 ```
 
-- API: http://localhost:8000
-- Health: http://localhost:8000/health
-- API docs: http://localhost:8000/docs
+The script creates a Python virtual environment, installs backend dependencies, installs frontend dependencies if needed, and starts both servers.
 
-The database container starts with pgvector enabled, but current API data remains in memory. Docker Compose uses development-only credentials; replace them and use secrets management before any public deployment.
+- Frontend: http://localhost:5173
+- API: http://127.0.0.1:8000
+- API docs: http://127.0.0.1:8000/docs
+- Health: http://127.0.0.1:8000/health
 
-## Run the frontend locally
+### Manual start
 
-In a second terminal:
+Terminal 1:
+
+```bash
+python3 -m venv backend/.venv
+source backend/.venv/bin/activate
+pip install -r backend/requirements.txt
+cd backend
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+Terminal 2:
 
 ```bash
 cd frontend
@@ -51,71 +46,92 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:5173. Vite proxies `/api` and `/health` requests to the backend on port 8000.
+## What works
 
-To create a production frontend build:
+- Grievance submission with description, location, language selection and prototype acknowledgement.
+- Preliminary classification across six public-service categories, including selected Hindi keywords.
+- Citizen correction of the suggested category.
+- Category-specific general next-step and document checklists.
+- Editable complaint draft and copy support.
+- SQLite persistence: records survive browser refreshes and backend restarts.
+- Citizen-recorded follow-up notes and reference numbers.
+- Local database analytics with explicit scope caveats.
+- Interactive OpenAPI documentation and automated API tests.
 
-```bash
-npm run build
-```
+## Storage and privacy
 
-## API endpoints
+SQLite is embedded and created automatically at `backend/data/samadhan.db`. No PostgreSQL server, Docker, API key or external database is needed. The database is ignored by Git.
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/health` | Health check |
-| GET | `/api/v1/categories` | Available categories |
-| POST | `/api/v1/grievances` | Create and analyse a grievance |
-| GET | `/api/v1/grievances` | List session grievances |
-| GET | `/api/v1/grievances/{id}` | Get a grievance |
-| PATCH | `/api/v1/grievances/{id}/complaint` | Save edited complaint draft |
-| POST | `/api/v1/grievances/{id}/followups` | Add citizen-recorded follow-up |
-| GET | `/api/v1/analytics/overview` | Session analytics |
+This is a single-user local prototype with no authentication or user-scoped access control. Do not enter Aadhaar numbers, bank details, passwords, OTPs or unnecessary sensitive information. Do not expose this build publicly with real personal data.
+
+## What is not implemented
+
+- No trained LLM/agent or claim of AI-powered reasoning.
+- No verified local authority directory or official portal recommendations.
+- No live government API, complaint submission or status tracking.
+- No user authentication, multi-user isolation or production security controls.
+- No evidence upload or official-document RAG.
+- Language selection is recorded, but the interface and complaint generator are not fully multilingual.
 
 ## Architecture
 
 ```text
-React + TypeScript + Vite
-          |
-     Vite API proxy
-          |
- FastAPI REST API
-   |      |       |
-rules  draft   guidance
-          |
-in-memory prototype store
-
-Docker Compose also starts PostgreSQL + pgvector
-(reserved for the persistence / retrieval phase)
+React + TypeScript + Vite (5173)
+          | Vite proxy /api
+FastAPI (8000)
+   | classifier + guidance + draft
+SQLite file (backend/data/samadhan.db)
 ```
 
-## Safety and trust
+See [architecture](docs/ARCHITECTURE.md), [privacy and safety](docs/PRIVACY_AND_SAFETY.md), and [demo script](docs/DEMO_SCRIPT.md).
 
-- Distinguish citizen-recorded information from government-confirmed status.
-- Do not invent officials, phone numbers, portals, deadlines or statutory procedures.
-- Verify jurisdiction and official source information before recommending a specific authority.
-- Obtain informed consent before storing or sharing personal data.
-- Never publish personal data in analytics or sample datasets.
-- Complaint drafts must be reviewed and submitted by the citizen through an independently verified official channel.
+## API
 
-## Development roadmap
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/health` | Health check |
+| GET | `/api/v1/categories` | Categories |
+| POST | `/api/v1/grievances` | Create grievance |
+| GET | `/api/v1/grievances` | List saved grievances |
+| GET | `/api/v1/grievances/{id}` | Grievance details |
+| PATCH | `/api/v1/grievances/{id}/complaint` | Update draft |
+| PATCH | `/api/v1/grievances/{id}/classification` | Citizen category correction |
+| POST | `/api/v1/grievances/{id}/followups` | Add citizen follow-up |
+| GET | `/api/v1/analytics/overview` | Local analytics |
 
-- [x] Runnable FastAPI and React/Vite application skeleton
-- [x] Grievance submission and preliminary rule-based categorisation
-- [x] Editable complaint draft and citizen follow-up notes
-- [x] Basic session analytics and API documentation
-- [ ] Persistent PostgreSQL models and migrations
-- [ ] Verified jurisdiction-to-authority directory with source citations
-- [ ] Official-document ingestion and cited retrieval
-- [ ] Multilingual classification and interface
-- [ ] Authentication, consent management and retention controls
-- [ ] Automated tests, CI and deployment
-- [ ] User testing and measured evaluation
+## Development
 
-## Contributing
+Backend tests:
 
-Please open an issue before large changes. Keep personal information and secrets out of commits.
+```bash
+cd backend
+PYTHONPATH=. pytest -q
+```
+
+Frontend production build:
+
+```bash
+cd frontend
+npm install
+npm run build
+```
+
+GitHub Actions runs both checks on pushes and pull requests to main.
+
+## Roadmap
+
+- [x] Standalone local setup without Docker or a database server
+- [x] SQLite persistence
+- [x] Six-category rule-based classification and selected Hindi keywords
+- [x] Citizen category correction
+- [x] Complaint draft and follow-up workflow
+- [x] API tests and CI
+- [ ] Authentication and multi-user authorisation
+- [ ] Verified authority directory with source provenance
+- [ ] Official-source retrieval with citations
+- [ ] Fully multilingual interface and evaluation
+- [ ] Security review and hosted deployment
 
 ## License
 
-MIT
+MIT. See [LICENSE](LICENSE).
