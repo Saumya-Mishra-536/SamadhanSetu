@@ -75,3 +75,19 @@ def test_delete_grievance_removes_record(client):
     gid = created["id"]
     assert client.delete(f"/api/v1/grievances/{gid}").status_code == 204
     assert client.get(f"/api/v1/grievances/{gid}").status_code == 404
+
+def test_grievance_survives_api_restart(tmp_path, monkeypatch):
+    monkeypatch.setattr(main, "DB_PATH", tmp_path / "restart.db")
+    main.reset_store()
+    with TestClient(main.app) as first_client:
+        created = first_client.post("/api/v1/grievances", json={
+            "description": "Garbage has not been collected for one week",
+            "location": "Patna, Bihar",
+            "consent": True
+        }).json()
+        grievance_id = created["id"]
+    with TestClient(main.app) as second_client:
+        restored = second_client.get(f"/api/v1/grievances/{grievance_id}")
+        assert restored.status_code == 200
+        assert restored.json()["id"] == grievance_id
+    main.reset_store()
