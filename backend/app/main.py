@@ -159,6 +159,8 @@ async def categories():
 @app.post("/api/v1/grievances", status_code=201)
 async def create_grievance(payload: GrievanceCreate):
     init_store()
+    if not payload.consent:
+        raise HTTPException(status_code=400, detail="Please acknowledge the prototype data-storage notice before saving this grievance.")
     classification = classify(payload.description)
     now = datetime.now(timezone.utc).isoformat()
     item: dict[str, Any] = {
@@ -239,6 +241,15 @@ async def add_followup(grievance_id: str, payload: FollowupCreate):
         db.execute("INSERT INTO followups (id, grievance_id, note, reference_number, status, created_at) VALUES (?, ?, ?, ?, ?, ?)", (record["id"], grievance_id, record["note"], record["reference_number"], record["status"], record["created_at"]))
         db.execute("UPDATE grievances SET updated_at = ? WHERE id = ?", (record["created_at"], grievance_id))
     return record
+
+@app.delete("/api/v1/grievances/{grievance_id}", status_code=204)
+async def delete_grievance(grievance_id: str):
+    init_store()
+    with connect() as db:
+        cursor = db.execute("DELETE FROM grievances WHERE id = ?", (grievance_id,))
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Grievance not found")
+    return None
 
 @app.get("/api/v1/analytics/overview")
 async def analytics_overview():
