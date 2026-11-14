@@ -1,31 +1,35 @@
-version: '3.8'
-
 services:
   db:
     image: pgvector/pgvector:pg15
-    env_file:
-      - ./env.template
     environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER:-ss_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ss_password}
+      POSTGRES_DB: ${POSTGRES_DB:-ss_db}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
       - ./backend/database/init-db:/docker-entrypoint-initdb.d:ro
-
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ss_user} -d ${POSTGRES_DB:-ss_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
   backend:
     build: ./backend
-    env_file:
-      - ./env.template
-    command: uvicorn app.main:app --host 0.0.0.0 --port ${FASTAPI_PORT:-8000} --reload
+    environment:
+      FASTAPI_HOST: 0.0.0.0
+      FASTAPI_PORT: 8000
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-ss_user}:${POSTGRES_PASSWORD:-ss_password}@db:5432/${POSTGRES_DB:-ss_db}
+      FRONTEND_URL: http://localhost:5173
+      APP_ENV: development
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     volumes:
       - ./backend:/app
     ports:
-      - "${FASTAPI_PORT:-8000}:${FASTAPI_PORT:-8000}"
+      - "8000:8000"
     depends_on:
-      - db
-
+      db:
+        condition: service_healthy
 volumes:
   db_data:
