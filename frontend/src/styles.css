@@ -33,3 +33,7 @@ body{font-size:16px;line-height:1.55}
 .app-shell.high-contrast{--green:#003b2b;--deep:#001f17;--muted:#34443b;--line:#7d8a80;color:#111;background:#fff}
 .app-shell.high-contrast .helper,.app-shell.high-contrast .prototype-notice{color:#222}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+.text-size-control{display:flex;gap:5px;align-items:center}.text-size-control button{border:1px solid #d6e0d8;background:#fff;border-radius:4px;padding:6px 9px;color:#174b3b;cursor:pointer;font-size:14px}
+.footer-links{display:flex;flex-wrap:wrap;gap:16px;margin-top:12px}.footer-links a{text-decoration:underline;text-underline-offset:3px;font-size:13px;color:inherit}
+.info-card{max-width:900px;margin:20px auto;background:#fff;border:1px solid var(--line);border-radius:7px;padding:clamp(22px,4vw,42px)}.info-card h1{color:var(--green);font-size:30px}.info-card h2{font-size:19px;margin-top:28px}.info-card p,.info-card li{font-size:16px;line-height:1.75;color:#44564b}.info-card .eyebrow{font-size:12px}
