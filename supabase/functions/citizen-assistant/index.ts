@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts"
 
 const cors = {
-  "Access-Control-Allow-Origin": Deno.env.get("APP_ORIGIN") ?? "*",
+  "Access-Control-Allow-Origin": Deno.env.get("APP_ORIGIN") ?? "null",
   "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Vary": "Origin",
@@ -13,6 +13,10 @@ const officialSources = [
   { name: "CPGRAMS", url: "https://pgportal.gov.in/V7/Home", scope: "Central public grievance portal; check exclusions and jurisdiction." },
 ]
 serve(async (req) => {
+  const allowedOrigin = Deno.env.get("APP_ORIGIN")
+  if (!allowedOrigin) return Response.json({ error: "Assistant origin is not configured." }, { status: 503 })
+  const requestOrigin = req.headers.get("Origin")
+  if (requestOrigin && requestOrigin !== allowedOrigin) return Response.json({ error: "Origin not allowed." }, { status: 403 })
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors })
   if (req.method !== "POST") return Response.json({ error: "Method not allowed" }, { status: 405, headers: cors })
   const auth = req.headers.get("Authorization") ?? ""

@@ -13,12 +13,14 @@ Samadhan Setu helps people organise a public-service concern, understand a preli
 The `feat/launch-platform-foundation` branch adds a Supabase-backed account and citizen-record foundation:
 - Email/password authentication, email confirmation and password reset request.
 - Profile settings and private profile-photo uploads.
-- English/Hindi language preference for the primary navigation, account and scheme-discovery screens.
+- English/Hindi language preference and partial bilingual screens (not yet a full translation of every control and message).
 - User-scoped grievance, follow-up and profile tables protected by Supabase row-level security.
+- Server-side PostgreSQL taxonomy and deterministic categorisation with broad citizen correction, jurisdiction hints and unverified authority-directory entries.
+- Bilingual privacy, terms, accessibility, disclaimer and help pages; skip navigation, focus styles, text-size/contrast controls and JSON data export.
 - Scheme discovery links to the official myScheme directory and its official eligibility engine.
 - An authenticated AI assistant Edge Function with strict limits against invented eligibility decisions or government status.
 
-See [launch readiness](docs/LAUNCH_READINESS.md) for setup and remaining work. This branch is not production-ready until a real Supabase project is configured, migrations and Edge Function are deployed, full interface translations are completed, and end-to-end security/accessibility testing passes. The assistant does not yet perform live scheme retrieval; official myScheme is the current source of scheme discovery and eligibility results.
+See [launch readiness](docs/LAUNCH_READINESS.md) for setup and remaining work. This branch is not production-ready until a real Supabase project is configured, migrations and Edge Function are deployed, full interface translations are completed, and end-to-end security/accessibility testing passes. The assistant does not yet perform live scheme retrieval; official myScheme is the current source of scheme discovery and eligibility results. The new second migration must be applied after the initial security migration.
 
 ## Run without Docker
 
@@ -59,7 +61,11 @@ npm install
 npm run dev
 ```
 
-## What works
+## Current hosted branch status
+
+The hosted UI in `feat/launch-platform-foundation` uses Supabase Auth and Supabase Postgres for user-scoped grievance records. The FastAPI + SQLite app remains a local prototype and is not part of the Vercel hosted path. Do not expose the SQLite API to the public internet.
+
+## What works in the local prototype
 
 - Grievance submission with description, location, language selection and prototype acknowledgement.
 - Preliminary classification across six public-service categories, including selected Hindi keywords.
@@ -73,18 +79,16 @@ npm run dev
 
 ## Storage and privacy
 
-SQLite is embedded and created automatically at `backend/data/samadhan.db`. No PostgreSQL server, Docker, API key or external database is needed. The database is ignored by Git.
-
-This is a single-user local prototype with no authentication or user-scoped access control. Do not enter Aadhaar numbers, bank details, passwords, OTPs or unnecessary sensitive information. Do not expose this build publicly with real personal data.
+The local prototype stores data in `backend/data/samadhan.db` and has no authentication or multi-user isolation. The hosted branch uses Supabase with row-level security, but must not accept real citizen data until the migration, storage policies, Auth redirects and cross-account isolation have been tested in the deployed project. Do not enter Aadhaar numbers, bank details, passwords, OTPs or unnecessary sensitive information.
 
 ## What is not implemented
 
 - No trained LLM/agent or claim of AI-powered reasoning.
 - No verified local authority directory or official portal recommendations.
 - No live government API, complaint submission or status tracking.
-- No user authentication, multi-user isolation or production security controls.
+- No verified authority assignment engine or live source retrieval; jurisdiction hints are not authority determinations.
 - No evidence upload or official-document RAG.
-- Language selection is recorded, but the interface and complaint generator are not fully multilingual.
+- Hindi/English support is partial; some detail labels, help text and assistant responses still need a complete language QA pass.
 
 ## Vercel preview
 
@@ -92,24 +96,18 @@ The redesigned Vite dashboard includes a Vercel static-site configuration. Deplo
 
 ## Architecture
 
-```text
-React + TypeScript + Vite (5173)
-          | Vite proxy /api
-FastAPI (8000)
-   | classifier + guidance + draft
-SQLite file (backend/data/samadhan.db)
-```
+Hosted UI: React + TypeScript + Vite on Vercel → Supabase Auth + Postgres/RLS + private Storage. The assistant Edge Function is optional and requires separate deployment/secrets.
+
+Local prototype only: React + TypeScript + Vite → FastAPI → SQLite. It is retained for offline development and tests; do not connect it to a public deployment.
 
 See [architecture](docs/ARCHITECTURE.md), [privacy and safety](docs/PRIVACY_AND_SAFETY.md), and [demo script](docs/DEMO_SCRIPT.md).
 
-## API
+## Local prototype API (not used by hosted Vercel frontend)
 
 | Method | Endpoint | Purpose |
 |---|---|---|
 | GET | `/health` | Health check |
 | GET | `/api/v1/categories` | Categories |
-| GET | `/api/v1/resources` | Source-linked official grievance channels |
-| GET | `/api/v1/resources` | Source-linked official grievance channels |
 | POST | `/api/v1/grievances` | Create grievance |
 | GET | `/api/v1/grievances` | List saved grievances |
 | GET | `/api/v1/grievances/{id}` | Grievance details |
@@ -148,12 +146,12 @@ GitHub Actions runs both checks on pushes and pull requests to main.
 - [x] Local record deletion
 - [x] Complaint draft and follow-up workflow
 - [x] API tests and CI
-- [ ] Authentication and multi-user authorisation
-- [ ] Verified authority directory with source provenance
+- [x] Email/password authentication and user-scoped hosted records with RLS (requires operator setup and deployment tests)
+- [ ] Human-verified authority directory with source provenance
 - [ ] Official-source retrieval with citations
-- [ ] Fully multilingual interface and evaluation
-- [ ] Persistent hosted database, authentication and record-level authorisation
-- [ ] Security review and fully functional hosted deployment
+- [ ] Full Hindi/English translation and language-specific evaluation
+- [x] Supabase hosted database schema and RLS foundation (operator must apply migrations and verify)
+- [ ] Security review, accessibility audit and fully functional hosted deployment
 
 ## License
 
