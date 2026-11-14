@@ -1,27 +1,37 @@
 # Demo script (2–3 minutes)
 
-## 0:00–0:20 — Problem
-“People often know that a public service has failed them, but do not know which office or process to approach. Samadhan Setu helps organise the issue and prepare the next step. It is not a government portal.”
+## Before recording
 
-## 0:20–0:55 — Submit
-Open the home page and choose **Report an issue**. Enter:
-- Description: “Garbage has not been collected from our street for the past seven days. The waste is piling up and causing a foul smell.”
+For the hosted demo, apply both Supabase migrations, configure Vercel environment variables and Auth redirects, and create a test account. Use fictional issue details only. If Supabase is not configured, use the local FastAPI/SQLite prototype and explicitly say that the account and hosted features are not part of that local demo.
+
+## 0:00–0:20 — Problem and trust
+
+“Citizens often know what public-service problem they face but are unsure how to organise it or find the right official starting point. Samadhan Setu is an independent civic-assistance platform, not a government website. It does not submit complaints or claim official status.”
+
+## 0:20–0:45 — Account and language
+
+Show sign-in/profile navigation. Switch English to Hindi and back. Mention that the interface is partially bilingual and the user's language preference can be saved. Do not present this as a complete translation of every screen.
+
+## 0:45–1:20 — Create a grievance
+
+Use fictional details:
+- Description: “Garbage has not been collected from our street for seven days. Waste is piling up and causing a foul smell.”
 - Location: “Ward 4, Patna, Bihar”
-- Language: English
 
-Submit and show the preliminary sanitation category.
+Submit and show the preliminary category/subcategory. Explain that the hosted path uses a server-side deterministic taxonomy, not a trained LLM or official classification. Show the jurisdiction hint and explain that it must be checked against the official source.
 
-## 0:55–1:25 — Citizen control
-Show the explanation that classification is a keyword-based suggestion. Change the category if appropriate and save the citizen correction.
+## 1:20–1:50 — Citizen control
 
-## 1:25–1:55 — Guidance and complaint draft
-Show the general next-step checklist and editable complaint draft. Edit one sentence and save it. Explain that the citizen must verify the recipient and submit through an official channel.
+Correct the broad category if appropriate. Review the editable complaint draft and general next steps. Explain that the citizen verifies the recipient and submits the draft through the relevant official portal.
 
-## 1:55–2:20 — Follow-up
-Add a citizen-recorded follow-up note. Emphasise that it is not a live government status update.
+## 1:50–2:15 — Official resources and assistant
 
-## 2:20–2:45 — Persistence and insights
-Refresh the browser and show that the record remains because it is stored in SQLite. Open Insights and explain that the counts represent only this local demo database.
+Open the resources page and point out that directory entries are unverified navigation starting points. Open the scheme page and myScheme link. If the assistant is configured, ask a general question and show its disclaimer. It has no live scheme retrieval, no eligibility determination and no government-status access.
+
+## 2:15–2:40 — Follow-up and personal insights
+
+Add a citizen-recorded follow-up note. Open Insights and explain that the counts are only the signed-in user's own records, not public or government statistics. Show the profile JSON export if time allows.
 
 ## Closing
-“Samadhan Setu turns a citizen's awaaz into a clearer, more organised path toward samadhan—while keeping the citizen in control.”
+
+“Samadhan Setu helps citizens turn an issue into a clearer, more organised next step—without pretending to be a government authority or taking control away from the citizen.”
