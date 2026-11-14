@@ -29,6 +29,53 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+OFFICIAL_RESOURCES = [
+    {
+        "id": "bihar-lok-shikayat",
+        "name": "Bihar Lok Shikayat",
+        "scope": "Bihar state government",
+        "description": "Bihar's public grievance redressal portal. The official portal provides grievance registration and status services under the Bihar Right to Public Grievance Redressal framework.",
+        "url": "https://lokshikayat.bihar.gov.in/DefaultEn.aspx",
+        "phone": "1800 345 6284",
+        "categories": ["welfare", "sanitation", "infrastructure", "utilities", "healthcare", "administration"],
+        "source_url": "https://lokshikayat.bihar.gov.in/AboutUsEn.aspx",
+        "verified_on": "2026-11-14",
+    },
+    {
+        "id": "bihar-sahyog",
+        "name": "Bihar Sahyog RTMS",
+        "scope": "Bihar state government",
+        "description": "Government of Bihar grievance portal describing complaint registration, status checking, reminders and feedback.",
+        "url": "https://sahyog.bihar.gov.in/Sahyog/Default.aspx",
+        "phone": "1100",
+        "categories": ["welfare", "sanitation", "infrastructure", "utilities", "healthcare", "administration"],
+        "source_url": "https://sahyog.bihar.gov.in/Sahyog/Default.aspx",
+        "verified_on": "2026-11-14",
+    },
+    {
+        "id": "bihar-upyog-civic",
+        "name": "Bihar UPYOG Citizen Services",
+        "scope": "Bihar urban local bodies",
+        "description": "Official citizen-services page with a civic complaint flow for garbage and sanitation, roads and streetlights, water and drainage, and other local issues. Select district and urban local body on the portal.",
+        "url": "https://upyog.bihar.gov.in/c/citizen-services",
+        "phone": None,
+        "categories": ["sanitation", "infrastructure", "utilities"],
+        "source_url": "https://upyog.bihar.gov.in/c/citizen-services",
+        "verified_on": "2026-11-14",
+    },
+    {
+        "id": "central-cpgrams",
+        "name": "CPGRAMS",
+        "scope": "Government of India ministries/departments and participating state organisations",
+        "description": "Centralised Public Grievance Redress and Monitoring System. The official portal supports grievance lodging, registration-ID tracking and appeal/feedback facilities. Check its exclusions and eligibility before filing.",
+        "url": "https://pgportal.gov.in/V7/Home",
+        "phone": None,
+        "categories": ["welfare", "sanitation", "infrastructure", "utilities", "healthcare", "administration"],
+        "source_url": "https://pgportal.gov.in/V7/Home",
+        "verified_on": "2026-11-14",
+    },
+]
+
 CATEGORY_RULES = [
     ("welfare", "Welfare and Government Schemes", ["pension", "scholarship", "ration", "dbt", "benefit", "subsidy", "payment", "not received", "scheme", "पेंशन", "छात्रवृत्ति", "राशन", "योजना", "किस्त", "भत्ता"]),
     ("sanitation", "Public Sanitation and Waste Management", ["garbage", "waste", "rubbish", "drain", "sewage", "toilet", "dumping", "cleaning", "overflow", "कचरा", "नाली", "सफाई", "गंदगी", "कूड़ा"]),
@@ -152,7 +199,7 @@ async def health():
         db.execute("SELECT 1")
     return {"status": "ok", "service": "samadhan-setu-api", "version": "1.0.0", "storage": "sqlite"}
 
-@app.get("/api/v1/categories")
+@app.get("/api/v1/resources")\nasync def resources():\n    return OFFICIAL_RESOURCES\n\n@app.get("/api/v1/categories")
 async def categories():
     return [{"id": key, "name": label} for key, label, _ in CATEGORY_RULES] + [{"id": "needs_review", "name": "Needs clarification"}]
 
