@@ -22,7 +22,7 @@ function Shell({children}:{children:React.ReactNode}) {
     <header className="topbar"><Link to="/" className="brand"><span className="brand-mark">स</span><span>Samadhan Setu<small>AWAAZ SE SAMADHAN TAK</small></span></Link><nav><NavLinks/><div className="text-size-control" aria-label="Accessibility settings"><button type="button" aria-label="Increase text size" aria-pressed={largeText} onClick={()=>setLargeText(v=>!v)}>A+</button><button type="button" aria-label="High contrast" aria-pressed={highContrast} onClick={()=>setHighContrast(v=>!v)}>◐</button></div><Link className="nav-cta" to="/submit">＋ {navText.raise}</Link><Link className="account-nav" to={user?"/profile":"/login"}>{user?(user.user_metadata?.full_name||navText.profile):navText.signIn}</Link><LanguageSwitch/></nav></header>
     <div className="prototype-notice"><span className="notice-dot"/> {navText.independent} · Complaints are not submitted automatically</div>
     <a className="skip-link" href="#main-content">Skip to main content</a>
-    <div id="main-content">{children}</div>
+    <div id="main-content" tabIndex={-1}>{children}</div>
     <AssistantWidget/>
     <footer><strong>Samadhan Setu</strong><span>Citizen assistance, made clearer.</span><p>This independent platform is not affiliated with or endorsed by any government department. Always verify information on official portals.</p><div className="footer-links"><Link to="/information/privacy">Privacy</Link><Link to="/information/terms">Terms</Link><Link to="/information/accessibility">Accessibility</Link><Link to="/information/disclaimer">Disclaimer</Link><Link to="/information/help">Help & FAQ</Link><Link to="/information/contact">Contact</Link></div></footer>
   </div>
