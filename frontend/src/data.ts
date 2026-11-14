@@ -34,11 +34,13 @@ function unwrap<T>(result:{data:T|null;error:{message:string}|null}):T {if(resul
 export async function createGrievance(description:string,location:string,language:string) {
   const db=requireClient();const {data:{user}}=await db.auth.getUser();if(!user)throw new Error('Sign in to save a grievance.')
   const classification=classify(description),created=new Date().toISOString(),guide=guidance(classification.category_id)
-  const row=unwrap(await db.from('grievances').insert({user_id:user.id,description,location,language,category_id:classification.category_id,classification,guidance:guide,complaint_draft:makeDraft(description,location,classification,created),status:'Draft - not submitted to government'}).select('*, followups(*)').single())
-  return row as Grievance
+  const result=await db.from('grievances').insert({user_id:user.id,description,location,language,category_id:classification.category_id,classification,guidance:guide,complaint_draft:makeDraft(description,location,classification,created),status:'Draft - not submitted to government'}).select('*, followups(*)').single()
+  if(result.error) throw new Error(result.error.message)
+  if(!result.data) throw new Error('Unable to save grievance.')
+  return result.data as unknown as Grievance
 }
 export async function listGrievances():Promise<Grievance[]> {const db=requireClient();const result=await db.from('grievances').select('*, followups(*)').order('created_at',{ascending:false});return (unwrap(result) as Grievance[])}
-export async function getGrievance(id:string):Promise<Grievance> {const db=requireClient();return unwrap(await db.from('grievances').select('*, followups(*)').eq('id',id).single()) as Grievance}
+export async function getGrievance(id:string):Promise<Grievance> {const db=requireClient();const result=await db.from('grievances').select('*, followups(*)').eq('id',id).single();if(result.error)throw new Error(result.error.message);if(!result.data)throw new Error('Grievance not found.');return result.data as unknown as Grievance}
 export async function saveComplaint(id:string,draft:string){const db=requireClient();unwrap(await db.from('grievances').update({complaint_draft:draft,updated_at:new Date().toISOString()}).eq('id',id).select('id').single());}
 export async function setCategory(id:string,categoryId:string){const db=requireClient();const name=categories[categoryId]?.name??'Needs clarification';const classification={category_id:categoryId,category:name,confidence:'citizen-selected',explanation:'Category selected by the citizen; not an official determination.'};const guide=guidance(categoryId);unwrap(await db.from('grievances').update({category_id:categoryId,classification,guidance:guide}).eq('id',id).select('id').single());return {classification,guidance:guide,complaint_draft:''}}
 export async function addFollowup(id:string,note:string,reference:string){const db=requireClient();const {data:{user}}=await db.auth.getUser();if(!user)throw new Error('Sign in required.');return unwrap(await db.from('followups').insert({grievance_id:id,user_id:user.id,note,reference_number:reference||null,status:'Citizen-recorded update'}).select('*').single()) as Followup}
