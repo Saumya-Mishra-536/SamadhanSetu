@@ -1,4 +1,5 @@
 import { createContext, useContext, useMemo, useState } from 'react'
+import { supabase } from './supabase'
 import type { ReactNode } from 'react'
 
 export type Language = 'en' | 'hi'
@@ -35,7 +36,7 @@ type Copy = typeof messages.en
 const LanguageContext = createContext<{ language: Language; setLanguage: (language: Language) => void; t: Copy } | null>(null)
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(() => (localStorage.getItem('samadhan-language') === 'hi' ? 'hi' : 'en'))
-  const setLanguage = (next: Language) => { localStorage.setItem('samadhan-language', next); setLanguageState(next) }
+  const setLanguage = (next: Language) => { localStorage.setItem('samadhan-language', next); setLanguageState(next); if (supabase) supabase.auth.getUser().then(({ data }) => { if (data.user) void supabase.from('profiles').upsert({ id: data.user.id, preferred_language: next }) }) }
   const value = useMemo(() => ({ language, setLanguage, t: messages[language] }), [language])
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>
 }
