@@ -45,3 +45,8 @@ The current assistant is an authenticated, guarded conversational helper. It has
 ## Important migration boundary
 
 The legacy FastAPI + SQLite grievance API is still used by the original grievance pages. The new React grievance workflows now query Supabase directly and rely on per-user RLS. Keep the public Vercel deployment as a non-sensitive preview until the Supabase migration is applied, Auth is configured, the Edge Function is deployed and end-to-end access-isolation tests pass. Do not expose the legacy API or accept real citizen data in it.
+
+
+## Scheme data integration boundary
+
+The current build links to the official myScheme directory and official eligibility engine. It does not scrape myScheme. The myScheme Terms of Use prohibit unauthorised bots/scrapers; API Setu integration requires partner registration, provider approval and issued credentials. If in-app live scheme search is required, obtain an authorised API subscription first, then implement an adapter with source timestamps and per-scheme provenance. Do not reverse-engineer private endpoints or scrape the site.
