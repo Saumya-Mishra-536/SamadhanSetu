@@ -27,3 +27,20 @@ Samadhan Setu is an independent civic-assistance platform. It is not a governmen
 
 ## Required secrets
 Never commit service-role keys, database passwords, email-provider secrets or AI-provider API keys. Only the Supabase anon key is intended for browser use, and only with correctly configured RLS.
+
+## Assistant deployment
+
+Deploy the Edge Function after linking the Supabase project:
+
+```bash
+supabase functions deploy citizen-assistant
+supabase secrets set OPENAI_API_KEY=...
+supabase secrets set OPENAI_MODEL=gpt-4.1-mini
+supabase secrets set APP_ORIGIN=https://your-real-domain.example
+```
+
+The current assistant is an authenticated, guarded conversational helper. It has a fixed list of official starting links but no live scheme crawler, retrieval index or eligibility engine. It must not be marketed as a live scheme-fetching agent until an official data source, ingestion schedule, source-level freshness metadata and scheme-specific eligibility rules have been implemented and tested.
+
+## Important migration boundary
+
+The legacy FastAPI + SQLite grievance API is still used by the original grievance pages. The new Supabase tables are prepared with per-user RLS, but the original pages have not yet been migrated to those tables. Keep the public Vercel deployment as a non-sensitive preview until that migration is complete. Do not expose the legacy API or accept real citizen data in it.
