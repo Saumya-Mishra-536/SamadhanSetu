@@ -59,7 +59,11 @@ npm install
 npm run dev
 ```
 
-## What works
+## Current hosted branch status
+
+The hosted UI in `feat/launch-platform-foundation` uses Supabase Auth and Supabase Postgres for user-scoped grievance records. The FastAPI + SQLite app remains a local prototype and is not part of the Vercel hosted path. Do not expose the SQLite API to the public internet.
+
+## What works in the local prototype
 
 - Grievance submission with description, location, language selection and prototype acknowledgement.
 - Preliminary classification across six public-service categories, including selected Hindi keywords.
@@ -73,16 +77,14 @@ npm run dev
 
 ## Storage and privacy
 
-SQLite is embedded and created automatically at `backend/data/samadhan.db`. No PostgreSQL server, Docker, API key or external database is needed. The database is ignored by Git.
-
-This is a single-user local prototype with no authentication or user-scoped access control. Do not enter Aadhaar numbers, bank details, passwords, OTPs or unnecessary sensitive information. Do not expose this build publicly with real personal data.
+The local prototype stores data in `backend/data/samadhan.db` and has no authentication or multi-user isolation. The hosted branch uses Supabase with row-level security, but must not accept real citizen data until the migration, storage policies, Auth redirects and cross-account isolation have been tested in the deployed project. Do not enter Aadhaar numbers, bank details, passwords, OTPs or unnecessary sensitive information.
 
 ## What is not implemented
 
 - No trained LLM/agent or claim of AI-powered reasoning.
 - No verified local authority directory or official portal recommendations.
 - No live government API, complaint submission or status tracking.
-- No user authentication, multi-user isolation or production security controls.
+- No trained LLM classification or verified authority routing engine.
 - No evidence upload or official-document RAG.
 - Language selection is recorded, but the interface and complaint generator are not fully multilingual.
 
@@ -92,24 +94,18 @@ The redesigned Vite dashboard includes a Vercel static-site configuration. Deplo
 
 ## Architecture
 
-```text
-React + TypeScript + Vite (5173)
-          | Vite proxy /api
-FastAPI (8000)
-   | classifier + guidance + draft
-SQLite file (backend/data/samadhan.db)
-```
+Hosted UI: React + TypeScript + Vite on Vercel → Supabase Auth + Postgres/RLS + private Storage. The assistant Edge Function is optional and requires separate deployment/secrets.
+
+Local prototype only: React + TypeScript + Vite → FastAPI → SQLite. It is retained for offline development and tests; do not connect it to a public deployment.
 
 See [architecture](docs/ARCHITECTURE.md), [privacy and safety](docs/PRIVACY_AND_SAFETY.md), and [demo script](docs/DEMO_SCRIPT.md).
 
-## API
+## Local prototype API (not used by hosted Vercel frontend)
 
 | Method | Endpoint | Purpose |
 |---|---|---|
 | GET | `/health` | Health check |
 | GET | `/api/v1/categories` | Categories |
-| GET | `/api/v1/resources` | Source-linked official grievance channels |
-| GET | `/api/v1/resources` | Source-linked official grievance channels |
 | POST | `/api/v1/grievances` | Create grievance |
 | GET | `/api/v1/grievances` | List saved grievances |
 | GET | `/api/v1/grievances/{id}` | Grievance details |
