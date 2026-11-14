@@ -90,7 +90,7 @@ See [architecture](docs/ARCHITECTURE.md), [privacy and safety](docs/PRIVACY_AND_
 | Method | Endpoint | Purpose |
 |---|---|---|
 | GET | `/health` | Health check |
-| GET | `/api/v1/categories` | Categories |
+| GET | `/api/v1/categories` | Categories |\n| GET | `/api/v1/resources` | Source-linked official grievance channels |
 | POST | `/api/v1/grievances` | Create grievance |
 | GET | `/api/v1/grievances` | List saved grievances |
 | GET | `/api/v1/grievances/{id}` | Grievance details |
@@ -123,7 +123,7 @@ GitHub Actions runs both checks on pushes and pull requests to main.
 - [x] Standalone local setup without Docker or a database server
 - [x] SQLite persistence
 - [x] Six-category rule-based classification and selected Hindi keywords
-- [x] Citizen category correction
+- [x] Citizen category correction\n- [x] Source-linked official grievance resources for Bihar and central-government channels\n- [x] Local record deletion
 - [x] Complaint draft and follow-up workflow
 - [x] API tests and CI
 - [ ] Authentication and multi-user authorisation
