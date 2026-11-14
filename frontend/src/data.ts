@@ -22,7 +22,7 @@ function unwrap<T>(result:{data:T|null;error:{message:string}|null}):T {if(resul
 export async function createGrievance(description:string,location:string,language:string,consent:boolean) {
   if(!consent) throw new Error('Please acknowledge the data-storage notice before saving this record.')
   const db=requireClient();const {data:{user}}=await db.auth.getUser();if(!user)throw new Error('Sign in to save a grievance.')
-  const result=await db.from('grievances').insert({user_id:user.id,description,location,language,consent,complaint_draft:'',status:'draft'}).select('*, followups(*)').single()
+  const result=await db.from('grievances').insert({user_id:user.id,description,location,language,consent,complaint_draft:''}).select('*, followups(*)').single()
   if(result.error) throw new Error(result.error.message)
   if(!result.data) throw new Error('Unable to save grievance.')
   return result.data as unknown as Grievance
