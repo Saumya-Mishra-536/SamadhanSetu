@@ -30,7 +30,7 @@ def test_categories_include_six_domains(client):
     ("हमारी गली में कचरा जमा है और सफाई नहीं हुई", "sanitation"),
 ])
 def test_classification_categories(client, description, expected):
-    result = client.post("/api/v1/grievances", json={"description": description, "location": "Ward 4, Patna, Bihar"})
+    result = client.post("/api/v1/grievances", json={"description": description, "location": "Ward 4, Patna, Bihar", "consent": True})
     assert result.status_code == 201
     assert result.json()["classification"]["category_id"] == expected
 
@@ -47,7 +47,7 @@ def test_create_edit_and_read_persisted_grievance(client):
     assert len(client.get("/api/v1/grievances").json()) == 1
 
 def test_followup_is_citizen_recorded_and_persisted(client):
-    created = client.post("/api/v1/grievances", json={"description": "My pension payment has not arrived for two months", "location": "Patna, Bihar"}).json()
+    created = client.post("/api/v1/grievances", json={"description": "My pension payment has not arrived for two months", "location": "Patna, Bihar", "consent": True}).json()
     gid = created["id"]
     response = client.post(f"/api/v1/grievances/{gid}/followups", json={"note": "I called the local office today", "reference_number": "LOCAL-123"})
     assert response.status_code == 201
@@ -55,7 +55,7 @@ def test_followup_is_citizen_recorded_and_persisted(client):
     assert client.get(f"/api/v1/grievances/{gid}").json()["followups"][0]["note"] == "I called the local office today"
 
 def test_citizen_can_correct_classification(client):
-    created = client.post("/api/v1/grievances", json={"description": "There is an issue with the public service", "location": "Patna"}).json()
+    created = client.post("/api/v1/grievances", json={"description": "There is an issue with the public service", "location": "Patna", "consent": True}).json()
     response = client.patch(f"/api/v1/grievances/{created['id']}/classification", json={"category_id": "utilities"})
     assert response.status_code == 200
     assert response.json()["classification"]["confidence"] == "citizen-selected"
@@ -65,3 +65,13 @@ def test_unknown_grievance_returns_404(client):
 
 def test_validation_rejects_short_description(client):
     assert client.post("/api/v1/grievances", json={"description": "short", "location": "Patna"}).status_code == 422
+
+def test_consent_acknowledgement_is_required(client):
+    response = client.post("/api/v1/grievances", json={"description": "Garbage collection has not happened", "location": "Patna"})
+    assert response.status_code == 400
+
+def test_delete_grievance_removes_record(client):
+    created = client.post("/api/v1/grievances", json={"description": "Garbage collection has not happened", "location": "Patna", "consent": True}).json()
+    gid = created["id"]
+    assert client.delete(f"/api/v1/grievances/{gid}").status_code == 204
+    assert client.get(f"/api/v1/grievances/{gid}").status_code == 404
