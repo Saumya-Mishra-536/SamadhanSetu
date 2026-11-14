@@ -43,13 +43,13 @@ alter table public.grievances add column if not exists jurisdiction_hint text no
 alter table public.grievances add column if not exists submitted_at timestamptz;
 alter table public.grievances add column if not exists retention_review_at timestamptz not null default (now() + interval '365 days');
 
-do $$ begin
+update public.grievances set status='draft' where status not in ('draft','prepared','citizen_submitted','closed');
+do $ begin
   if not exists (select 1 from pg_constraint where conname='grievances_status_check_v2') then
     alter table public.grievances add constraint grievances_status_check_v2
     check (status in ('draft','prepared','citizen_submitted','closed'));
   end if;
-end $$;
-update public.grievances set status='draft' where status not in ('draft','prepared','citizen_submitted','closed');
+end $;
 
 create or replace function public.classify_grievance_server()
 returns trigger language plpgsql security definer set search_path=public as $$
@@ -162,12 +162,13 @@ create table if not exists public.authority_directory (
 alter table public.authority_directory enable row level security;
 drop policy if exists authority_directory_read_authenticated on public.authority_directory;
 create policy authority_directory_read_authenticated on public.authority_directory for select to authenticated using (true);
+create unique index if not exists authority_directory_official_url_uidx on public.authority_directory(official_url);
 insert into public.authority_directory(name,jurisdiction,category_ids,official_url,source_url,verification_status,notes)
 values
 ('Bihar Lok Shikayat','Bihar state government',array['welfare','sanitation','infrastructure','utilities','healthcare','administration'],'https://lokshikayat.bihar.gov.in/DefaultEn.aspx','https://lokshikayat.bihar.gov.in/AboutUsEn.aspx','unverified','Listed as an official starting point; user must confirm issue coverage and jurisdiction.'),
 ('Bihar UPYOG Citizen Services','Bihar urban local bodies',array['sanitation','infrastructure','utilities'],'https://upyog.bihar.gov.in/c/citizen-services','https://upyog.bihar.gov.in/c/citizen-services','unverified','Select the relevant urban local body and verify current service coverage.'),
 ('CPGRAMS','Government of India',array['welfare','sanitation','infrastructure','utilities','healthcare','administration'],'https://pgportal.gov.in/V7/Home','https://pgportal.gov.in/V7/Home','unverified','Check exclusions and jurisdiction before filing.')
-on conflict do nothing;
+on conflict (official_url) do nothing;
 
 create table if not exists public.grievance_audit_log (
   id bigserial primary key,
