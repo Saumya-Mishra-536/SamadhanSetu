@@ -93,7 +93,8 @@ export function ProfilePage() {
       if (signedError) setError(signedError.message)
       else {
         const { error: updateError } = await supabase.auth.updateUser({ data: { avatar_path: path } })
-        if (updateError) setError(updateError.message)
+        const { error: profileError } = await supabase.from('profiles').upsert({ id: user.id, avatar_path: path })
+        if (updateError || profileError) setError(updateError?.message || profileError?.message || 'Photo update failed.')
         else { setAvatar(data.signedUrl); setNotice('Profile photo updated.') }
       }
     }
