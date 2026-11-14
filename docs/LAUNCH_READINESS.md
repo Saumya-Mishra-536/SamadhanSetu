@@ -19,7 +19,8 @@ Samadhan Setu is an independent civic-assistance platform. It is not a governmen
 6. Test sign-up, email confirmation, sign-in, password reset, profile update, avatar upload and cross-user access denial.
 
 ## Not yet launch-ready
-- Existing grievance pages still call the legacy SQLite API. They must be migrated to authenticated Supabase queries before public use; do not expose the SQLite API.
+- React grievance pages now use Supabase tables with row-level security. The legacy FastAPI + SQLite API remains in the repository for local reference only; do not expose it publicly or connect the hosted frontend to it.
+- The hosted schema migration and Edge Function must be applied/deployed and tested in a real Supabase project before use.
 - The account UI is a first implementation and requires end-to-end testing against a real Supabase project.
 - Scheme catalogue ingestion, source freshness checks and scheme-specific eligibility rules are not yet implemented.
 - AI assistant retrieval, citations, abuse controls, privacy review and model-provider configuration are not yet implemented.
@@ -43,4 +44,4 @@ The current assistant is an authenticated, guarded conversational helper. It has
 
 ## Important migration boundary
 
-The legacy FastAPI + SQLite grievance API is still used by the original grievance pages. The new Supabase tables are prepared with per-user RLS, but the original pages have not yet been migrated to those tables. Keep the public Vercel deployment as a non-sensitive preview until that migration is complete. Do not expose the legacy API or accept real citizen data in it.
+The legacy FastAPI + SQLite grievance API is still used by the original grievance pages. The new React grievance workflows now query Supabase directly and rely on per-user RLS. Keep the public Vercel deployment as a non-sensitive preview until the Supabase migration is applied, Auth is configured, the Edge Function is deployed and end-to-end access-isolation tests pass. Do not expose the legacy API or accept real citizen data in it.
