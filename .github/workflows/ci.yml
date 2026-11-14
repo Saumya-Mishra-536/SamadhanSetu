@@ -5,6 +5,11 @@ on:
   pull_request:
     branches: [main]
 jobs:
+  shell-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash -n start.sh
   backend:
     runs-on: ubuntu-latest
     steps:
