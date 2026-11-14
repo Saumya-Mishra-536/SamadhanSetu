@@ -109,7 +109,7 @@ on public.grievances for each row execute function public.classify_grievance_ser
 
 -- Clients can only insert the citizen-supplied fields. Classification and routing hints are server-owned.
 revoke insert on public.grievances from authenticated;
-grant insert (user_id,description,location,language,consent,complaint_draft,status) on public.grievances to authenticated;
+grant insert (user_id,description,location,language,consent,complaint_draft) on public.grievances to authenticated;
 revoke update on public.grievances from authenticated;
 grant update (complaint_draft,guidance,updated_at) on public.grievances to authenticated;
 
