@@ -111,3 +111,5 @@ end;
 $$;
 revoke all on function public.consume_assistant_quota() from public;
 grant execute on function public.consume_assistant_quota() to authenticated;
+
+alter table public.grievances add column if not exists consent boolean not null default false;
