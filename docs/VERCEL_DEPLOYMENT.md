@@ -58,7 +58,7 @@ Use fictional test data only. Before accepting any real citizen information, com
 
 - [ ] Sign up and receive/complete email confirmation.
 - [ ] Sign in, sign out and password reset.
-- [ ] Update profile details and upload/read/replace/delete a profile photo.
+- [ ] Update profile details and upload/read a profile photo (replacement creates a new object; old-object cleanup is not exposed in the UI).
 - [ ] Create a grievance draft in English and Hindi.
 - [ ] Confirm server-side keyword classification and the `needs_review` fallback.
 - [ ] Correct the category and confirm the change persists after refresh.
