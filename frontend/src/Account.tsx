@@ -77,7 +77,8 @@ export function ProfilePage() {
     e.preventDefault(); if (!supabase || !user) return
     setBusy(true); setError(''); setNotice('')
     const { error: updateError } = await supabase.auth.updateUser({ data: { full_name: name.trim(), phone: phone.trim() } })
-    if (updateError) setError(updateError.message); else setNotice('Profile updated.')
+    const { error: profileError } = await supabase.from('profiles').upsert({ id: user.id, full_name: name.trim(), phone: phone.trim() })
+    if (updateError || profileError) setError(updateError?.message || profileError?.message || 'Profile update failed.'); else setNotice('Profile updated.')
     setBusy(false)
   }
   async function upload(file?: File) {
