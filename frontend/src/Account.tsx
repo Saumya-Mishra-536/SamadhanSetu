@@ -66,6 +66,22 @@ export function ProfilePage() {
   const [notice, setNotice] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [recovery, setRecovery] = useState(() => window.location.hash.includes('type=recovery'))
+  const [newPassword, setNewPassword] = useState('')
+  useEffect(() => {
+    if (!supabase) return
+    const { data: listener } = supabase.auth.onAuthStateChange((event) => { if (event === 'PASSWORD_RECOVERY') setRecovery(true) })
+    return () => listener.subscription.unsubscribe()
+  }, [])
+  async function updatePassword(e: React.FormEvent) {
+    e.preventDefault()
+    if (!supabase || newPassword.length < 8) return setError('Use at least 8 characters for your new password.')
+    setBusy(true); setError(''); setNotice('')
+    const { error: passwordError } = await supabase.auth.updateUser({ password: newPassword })
+    if (passwordError) setError(passwordError.message)
+    else { setRecovery(false); setNewPassword(''); setNotice('Password updated successfully.') }
+    setBusy(false)
+  }
   useEffect(() => {
     setName(String(user?.user_metadata?.full_name ?? ''))
     setPhone(String(user?.user_metadata?.phone ?? ''))
@@ -103,7 +119,7 @@ export function ProfilePage() {
   async function signOut() { if (supabase) { await supabase.auth.signOut(); window.location.href='/' } }
   if (loading) return <main className="page-wrap"><p>Loading account…</p></main>
   if (!user) return <main className="page-wrap"><section className="form-card"><h1>Sign in required</h1><p>Sign in to manage your profile.</p><Link className="button primary" to="/login">Sign in</Link></section></main>
-  return <main className="page-wrap account-wrap"><section className="form-card account-card"><div className="eyebrow">ACCOUNT SETTINGS</div><h1>{t.profileTitle}</h1>
+  return <main className="page-wrap account-wrap"><section className="form-card account-card"><div className="eyebrow">ACCOUNT SETTINGS</div><h1>{t.profileTitle}</h1>{recovery&&<form onSubmit={updatePassword}><label>New password<input type="password" minLength={8} value={newPassword} onChange={e=>setNewPassword(e.target.value)} required/></label><button className="button primary" disabled={busy}>Update password</button></form>}
     <div className="avatar-row">{avatar?<img src={avatar} alt="Profile" className="avatar-preview"/>:<div className="avatar-placeholder">{name.slice(0,1).toUpperCase()||'S'}</div>}<div><b>{t.avatar}</b><label className="upload-label">{t.upload}<input type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>upload(e.target.files?.[0])} disabled={busy}/></label><small>JPG, PNG or WebP · 2 MB maximum</small></div></div>
     <form onSubmit={save}><label>{t.name}<input value={name} onChange={e=>setName(e.target.value)} maxLength={100}/></label><label>{t.email}<input value={user.email??''} disabled/></label><label>{t.phone}<input type="tel" value={phone} onChange={e=>setPhone(e.target.value)} maxLength={20}/></label><button className="button primary" disabled={busy}>{t.save}</button></form>
     {notice&&<p className="success-msg">{notice}</p>}{error&&<p className="error">{error}</p>}<button className="button secondary signout" onClick={signOut}>{t.signOut}</button>
