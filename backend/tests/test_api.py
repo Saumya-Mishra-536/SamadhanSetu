@@ -1,37 +1,67 @@
+import pytest
 from fastapi.testclient import TestClient
-from app.main import app, GRIEVANCES
+from app import main
 
-client = TestClient(app)
+@pytest.fixture()
+def client(tmp_path, monkeypatch):
+    monkeypatch.setattr(main, "DB_PATH", tmp_path / "test.db")
+    main.reset_store()
+    with TestClient(main.app) as test_client:
+        yield test_client
+    main.reset_store()
 
-def setup_function():
-    GRIEVANCES.clear()
-
-def test_health():
+def test_health_reports_sqlite(client):
     response = client.get("/health")
     assert response.status_code == 200
-    assert response.json()["status"] == "ok"
+    assert response.json()["storage"] == "sqlite"
 
-def test_categories_include_six_domains():
+def test_categories_include_six_domains(client):
     response = client.get("/api/v1/categories")
     assert response.status_code == 200
     assert len([x for x in response.json() if x["id"] != "needs_review"]) == 6
 
-def test_create_grievance_and_generate_draft():
-    response = client.post("/api/v1/grievances", json={
+@pytest.mark.parametrize(("description", "expected"), [
+    ("Garbage has not been collected from our street for seven days", "sanitation"),
+    ("My pension payment has not arrived for two months", "welfare"),
+    ("There are dangerous potholes on our road", "infrastructure"),
+    ("There has been no electricity supply since yesterday", "utilities"),
+    ("The government hospital has no prescribed medicine", "healthcare"),
+    ("My birth certificate application is delayed", "administration"),
+    ("हमारी गली में कचरा जमा है और सफाई नहीं हुई", "sanitation"),
+])
+def test_classification_categories(client, description, expected):
+    result = client.post("/api/v1/grievances", json={"description": description, "location": "Ward 4, Patna, Bihar"})
+    assert result.status_code == 201
+    assert result.json()["classification"]["category_id"] == expected
+
+def test_create_edit_and_read_persisted_grievance(client):
+    created = client.post("/api/v1/grievances", json={
         "description": "Garbage has not been collected from our street for seven days",
         "location": "Ward 4, Patna, Bihar", "language": "English", "consent": True
-    })
-    assert response.status_code == 201
-    body = response.json()
-    assert body["classification"]["category_id"] == "sanitation"
-    assert "Subject:" in body["complaint_draft"]
-    assert body["status"] == "Draft - not submitted to government"
+    }).json()
+    gid = created["id"]
+    edited = "Subject: Please review the sanitation issue in Ward 4.\n\nUpdated complaint draft for review."
+    assert client.patch(f"/api/v1/grievances/{gid}/complaint", json={"complaint_draft": edited}).status_code == 200
+    fetched = client.get(f"/api/v1/grievances/{gid}").json()
+    assert fetched["complaint_draft"] == edited
+    assert len(client.get("/api/v1/grievances").json()) == 1
 
-def test_followup_is_citizen_recorded():
+def test_followup_is_citizen_recorded_and_persisted(client):
     created = client.post("/api/v1/grievances", json={"description": "My pension payment has not arrived for two months", "location": "Patna, Bihar"}).json()
-    response = client.post(f"/api/v1/grievances/{created['id']}/followups", json={"note": "I called the local office today", "reference_number": "LOCAL-123"})
+    gid = created["id"]
+    response = client.post(f"/api/v1/grievances/{gid}/followups", json={"note": "I called the local office today", "reference_number": "LOCAL-123"})
     assert response.status_code == 201
     assert response.json()["source"] == "citizen_recorded"
+    assert client.get(f"/api/v1/grievances/{gid}").json()["followups"][0]["note"] == "I called the local office today"
 
-def test_unknown_grievance_returns_404():
+def test_citizen_can_correct_classification(client):
+    created = client.post("/api/v1/grievances", json={"description": "There is an issue with the public service", "location": "Patna"}).json()
+    response = client.patch(f"/api/v1/grievances/{created['id']}/classification", json={"category_id": "utilities"})
+    assert response.status_code == 200
+    assert response.json()["classification"]["confidence"] == "citizen-selected"
+
+def test_unknown_grievance_returns_404(client):
     assert client.get("/api/v1/grievances/not-a-real-id").status_code == 404
+
+def test_validation_rejects_short_description(client):
+    assert client.post("/api/v1/grievances", json={"description": "short", "location": "Patna"}).status_code == 422
