@@ -1,40 +1,60 @@
 # Architecture
 
-## Current runnable architecture
+## Hosted architecture (current target)
 
 ```text
-Browser
+Citizen browser
   |
-React + TypeScript + Vite (localhost:5173)
-  | Vite development proxy: /api -> localhost:8000
-FastAPI (localhost:8000)
-  |-- transparent keyword classifier (English + selected Hindi terms)
-  |-- category-specific general guidance
-  |-- editable complaint-draft generator
-  |-- SQLite repository (backend/data/samadhan.db)
-  |-- citizen-recorded follow-up history
+Vercel: React + TypeScript + Vite
+  |-- Supabase Auth (email/password)
+  |-- Supabase Postgres + Row Level Security
+  |     |-- profiles
+  |     |-- grievances + followups
+  |     |-- service_taxonomy (server-side deterministic classification)
+  |     |-- authority_directory (entries default to unverified)
+  |     |-- grievance_audit_log
+  |-- Supabase Storage (private avatars; private evidence bucket prepared)
+  |-- Supabase Edge Function (optional citizen assistant)
+        |-- JWT verification
+        |-- per-user quota RPC
+        |-- OpenAI-compatible provider, secret stored server-side
 ```
 
-SQLite is embedded and file-based. The app creates its schema automatically. No Docker, PostgreSQL service, API key or hosted AI model is required.
+The Vercel frontend reads and writes user-owned records through Supabase with RLS. The legacy FastAPI + SQLite implementation is retained for local/offline prototype work and backend tests; it is not called by the hosted Vercel frontend and must not be exposed as a public multi-user API.
 
-## Data model
+## Classification and taxonomy
 
-- grievances: description, location, selected language, optional contact fields, consent acknowledgement, classification JSON, guidance JSON, complaint draft, status and timestamps.
-- followups: grievance foreign key, note, optional reference number, citizen-entered status and timestamp.
+The hosted insert path supplies only citizen-entered fields. A PostgreSQL trigger classifies the text against service_taxonomy on the server and stores category/subcategory, confidence label, explanation and a jurisdiction hint. This is a deterministic keyword taxonomy, not an LLM, trained model or official decision. Citizens can correct the broad category through an ownership-checked RPC.
+
+Taxonomy entries include pension, scholarship, public distribution/ration, solid waste, drainage, roads, street lighting, water supply, electricity, public health facilities and certificates/citizen services. Jurisdiction hints are guidance to verify, not an authority assignment.
+
+## Authority directory and evidence
+
+The authority_directory table stores name, jurisdiction, category IDs, official URL, source URL and verification status. Seed entries are explicitly unverified until a human checks them. No authority match is automatically asserted from a grievance description.
+
+The private evidence bucket and metadata table are prepared in the hosted migration. The upload UI is not yet implemented. Evidence files must never be made public.
+
+## Analytics
+
+The current Insights page counts only the signed-in user's own records under RLS. These are personal workspace metrics, not government or population-level aggregates. No global public aggregate is exposed.
 
 ## Trust boundaries
 
-- Classification is a preliminary keyword suggestion, not an official decision or trained model output.
-- Citizens can correct the category.
-- Guidance is general; the app does not claim a named local authority without verified jurisdiction data.
-- Complaint drafts are editable and are never submitted by the app.
-- Follow-up records are citizen-entered, not live government status.
-- Analytics are local database counts, not population-level governance statistics.
+- The platform is independent and is not a government website or MyGov service.
+- Classification and guidance are preliminary informational suggestions.
+- Official portal links are navigation only; no grievance is submitted by the app.
+- Follow-up notes are citizen-entered, not government-confirmed status.
+- The assistant has no live scheme retrieval or eligibility engine; it links users to official sources and must not invent rules or outcomes.
+- The Supabase project must be configured and RLS tested before real data is accepted.
 
-## Next increments
+## Local prototype
 
-1. Add authentication and user-scoped data access before public deployment.
-2. Add a verified authority directory with official source URL, jurisdiction, last-checked date and provenance.
-3. Add source-grounded document retrieval and citations.
-4. Add multilingual UX and evaluated language-specific classification.
-5. Add secure evidence storage only when required.
+```text
+React + TypeScript + Vite
+  | Vite development proxy
+FastAPI
+  | transparent classifier and local CRUD
+SQLite (backend/data/samadhan.db)
+```
+
+This path is for local demo/testing only. It has no hosted multi-user authorisation. Keep it off the public internet.
